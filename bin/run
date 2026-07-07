@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "Starting Rails server on http://vibe_bot_wars.localhost:3000 (cmd-click to open)"
+rails s
