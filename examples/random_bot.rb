@@ -5,8 +5,10 @@
 #
 #   ruby examples/random_bot.rb [port]      # default port 4567
 #
-# Then register a bot in the UI with webhook URL http://127.0.0.1:4567/ and start a
-# match. It implements the same contract as the built-in /demo_bot: greedily heads
+# It listens on all interfaces and prints its LAN URL, so register a bot in the UI with
+# the http://<shown-ip>:4567/ webhook URL (reachable from the game server on the same
+# WiFi) and start a match. It implements the same contract as the built-in /demo_bot:
+# greedily heads
 # for the nearest visible gem, repairs when hurt, scans when it sees nothing, and
 # wanders randomly otherwise.
 
@@ -51,6 +53,12 @@ def blocked?(me, dir, walls)
   walls.include?([me["x"] + dx, me["y"] + dy])
 end
 
+# Best-guess LAN address to advertise (the private IPv4 of this machine), so the game
+# server on the same WiFi can reach us. Falls back to localhost if none is found.
+def local_ip
+  Socket.ip_address_list.detect(&:ipv4_private?)&.ip_address || "127.0.0.1"
+end
+
 def read_request(client)
   client.gets # request line
   length = 0
@@ -61,8 +69,8 @@ def read_request(client)
   length.positive? ? client.read(length).to_s : ""
 end
 
-server = TCPServer.new("127.0.0.1", PORT)
-puts "random_bot listening on http://127.0.0.1:#{PORT}/  (Ctrl-C to stop)"
+server = TCPServer.new("0.0.0.0", PORT)
+puts "random_bot listening on http://#{local_ip}:#{PORT}/  (Ctrl-C to stop)"
 
 loop do
   client = server.accept
