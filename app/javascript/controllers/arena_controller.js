@@ -57,6 +57,19 @@ export default class extends Controller {
     for (const [x, y] of state.gems || []) this.drawGem(ctx, x, y)
 
     for (const bot of state.bots || []) if (bot.x != null) this.drawBot(ctx, bot)
+
+    // Drawn last so a crash shows even on a cell occupied by a bot; cleared next tick.
+    for (const [x, y] of state.collisions || []) this.drawCollision(ctx, x, y)
+  }
+
+  drawCollision(ctx, x, y) {
+    const c = this.cell
+    ctx.fillStyle = "rgba(248,113,113,0.35)"
+    ctx.fillRect(x * c, y * c, c, c)
+    ctx.strokeStyle = "rgba(248,113,113,0.95)"
+    ctx.lineWidth = 3
+    ctx.strokeRect(x * c + 1.5, y * c + 1.5, c - 3, c - 3)
+    ctx.lineWidth = 1
   }
 
   line(ctx, x1, y1, x2, y2) {

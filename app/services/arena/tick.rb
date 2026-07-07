@@ -28,8 +28,14 @@ module Arena
       resolve(actions)
       advance_clock
       persist
-      Broadcaster.call(@game)
+      Broadcaster.call(@game, collisions: collision_cells)
       @game
+    end
+
+    # Cells that saw a crash this tick, for a brief highlight in the UI: the contested
+    # cells of bot-bot collisions plus the recoil cells of bots that hit a wall/edge.
+    def collision_cells
+      (@collision_cells.to_a + @crashers.map(&:coordinates)).uniq
     end
 
     private
@@ -84,6 +90,7 @@ module Arena
     def resolve(actions)
       @crashers = []
       @collision_opponents = Hash.new { |hash, bot| hash[bot] = Set.new } # bot => bots it hit
+      @collision_cells = Set.new # contested cells, for the UI highlight
       intents = {} # bot => target [x, y]
 
       @bots.each do |bot|
@@ -144,6 +151,7 @@ module Arena
     # at the same cell, and a swap partner. Collisions are mutual.
     def record_collision(bot, intents)
       target = intents[bot]
+      @collision_cells << target # the contested cell — the point of impact
       occupant = @bots.find { |b| !intents.key?(b) && b.coordinates == target }
       same_target = intents.keys.select { |b| b != bot && intents[b] == target }
       swap_partner = intents.keys.find { |b| b != bot && b.coordinates == target && intents[b] == bot.coordinates }

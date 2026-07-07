@@ -5,8 +5,18 @@ require "test_helper"
 module Arena
   class TickTest < ActiveSupport::TestCase
     include ArenaTestHelpers
+    include ActionCable::TestHelper
 
     setup { @game = build_running_game }
+
+    test "the contested cell of a collision is broadcast for the UI to highlight" do
+      place_bot(@game, name: "A", x: 4, y: 5)
+      place_bot(@game, name: "B", x: 6, y: 5)
+      messages = capture_broadcasts(Broadcaster::STREAM) do
+        Tick.call(@game, client: StubClient.new("A" => move("E"), "B" => move("W"))) # both -> (5,5)
+      end
+      assert_includes messages.last["collisions"], [5, 5]
+    end
 
     test "an open move relocates the bot and sets heading" do
       bot = place_bot(@game, name: "A", x: 5, y: 5)
@@ -57,6 +67,32 @@ module Arena
       assert_equal [7, 5], c.coordinates
       assert_equal @game.max_hp - @game.collision_damage, a.hp
       assert_equal @game.max_hp - @game.collision_damage, c.hp
+    end
+
+    test "two bots colliding into one cell both take damage while an idle third is untouched" do
+      a = place_bot(@game, name: "A", x: 4, y: 5)
+      b = place_bot(@game, name: "B", x: 6, y: 5)
+      c = place_bot(@game, name: "C", x: 4, y: 8) # idles, uninvolved
+      Tick.call(@game, client: StubClient.new("A" => move("E"), "B" => move("W"))) # both -> (5,5)
+      [a, b, c].each(&:reload)
+
+      assert_equal [4, 5], a.coordinates
+      assert_equal [6, 5], b.coordinates
+      assert_equal @game.max_hp - @game.collision_damage, a.hp, "A took damage"
+      assert_equal @game.max_hp - @game.collision_damage, b.hp, "B took damage"
+      assert_equal @game.max_hp, c.hp, "the idle third bot is unharmed"
+    end
+
+    test "two bots ramming a stationary third bot: all three take damage" do
+      a = place_bot(@game, name: "A", x: 4, y: 5)
+      b = place_bot(@game, name: "B", x: 6, y: 5)
+      c = place_bot(@game, name: "C", x: 5, y: 5) # idles on the contested cell
+      Tick.call(@game, client: StubClient.new("A" => move("E"), "B" => move("W"))) # both -> (5,5)
+      [a, b, c].each(&:reload)
+
+      assert_equal @game.max_hp - @game.collision_damage, a.hp
+      assert_equal @game.max_hp - @game.collision_damage, b.hp
+      assert_equal @game.max_hp - @game.collision_damage, c.hp, "the rammed bot took damage"
     end
 
     test "bots swapping cells collide" do

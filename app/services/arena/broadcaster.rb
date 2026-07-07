@@ -6,12 +6,15 @@ module Arena
   class Broadcaster
     STREAM = "arena"
 
-    def self.call(game)
-      new(game).call
+    def self.call(game, collisions: [])
+      new(game, collisions:).call
     end
 
-    def initialize(game)
+    # `collisions` are the cells where a crash happened this tick (for a brief UI flash);
+    # only Arena::Tick passes them — plain page loads render without any.
+    def initialize(game, collisions: [])
       @game = game
+      @collisions = collisions
     end
 
     def call
@@ -28,6 +31,7 @@ module Arena
         height: @game.height,
         walls: @game.walls,
         gems: @game.gems,
+        collisions: @collisions,
         winner_bot_id: @game.winner_bot_id,
         winning_group: results.winning_group,
         groups: results.group_summaries,
