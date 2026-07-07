@@ -15,3 +15,5 @@ module ActiveSupport
     # Add more helper methods to be used by all tests here...
   end
 end
+
+Dir[File.expand_path("support/**/*.rb", __dir__)].each { |file| require file }
