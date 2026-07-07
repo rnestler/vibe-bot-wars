@@ -1,3 +1,95 @@
-<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="256" cy="256" r="256" fill="red"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1a1c24" />
+      <stop offset="100%" stop-color="#0d0e12" />
+    </linearGradient>
+
+    <linearGradient id="metalGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a0acbc" />
+      <stop offset="50%" stop-color="#5b6675" />
+      <stop offset="100%" stop-color="#2d323b" />
+    </linearGradient>
+
+    <linearGradient id="blueNeon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f0ff" />
+      <stop offset="100%" stop-color="#0066ff" />
+    </linearGradient>
+    <linearGradient id="blueDark" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0044aa" />
+      <stop offset="100%" stop-color="#001133" />
+    </linearGradient>
+
+    <linearGradient id="orangeNeon" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ff9900" />
+      <stop offset="100%" stop-color="#ff3300" />
+    </linearGradient>
+    <linearGradient id="orangeDark" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#aa3300" />
+      <stop offset="100%" stop-color="#330a00" />
+    </linearGradient>
+
+    <filter id="glowBlue" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+    <filter id="glowOrange" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <path d="M 256,12 L 465,95 L 500,310 L 400,475 L 256,500 L 112,475 L 12,310 L 47,95 Z" 
+        fill="url(#bgGrad)" stroke="url(#metalGrad)" stroke-width="16" stroke-linejoin="round" />
+  
+  <path d="M 256,28 L 445,103 L 476,298 L 385,450 L 256,472 L 127,450 L 36,298 L 67,103 Z" 
+        fill="#12141a" stroke="#2c313d" stroke-width="4" stroke-linejoin="round" />
+
+  <path d="M 40,256 L 472,256 M 256,35 L 256,470 M 95,95 L 417,417 M 95,417 L 417,95" 
+        stroke="#1f232e" stroke-width="3" opacity="0.7" />
+
+  <path d="M 250,50 L 430,120 L 450,290 L 370,430 L 250,450 Z" fill="url(#blueDark)" opacity="0.25" />
+  <path d="M 244,70 L 410,135 L 428,285 L 356,415 L 244,435 Z" fill="none" stroke="url(#blueNeon)" stroke-width="4" filter="url(#glowBlue)" />
+  
+  <path d="M 262,50 L 82,120 L 62,290 L 142,430 L 262,450 Z" fill="url(#orangeDark)" opacity="0.25" />
+  <path d="M 268,70 L 102,135 L 84,285 L 156,415 L 268,435 Z" fill="none" stroke="url(#orangeNeon)" stroke-width="4" filter="url(#glowOrange)" />
+
+  <g transform="translate(256, 250) scale(1.25)">
+    <circle cx="0" cy="0" r="65" fill="none" stroke="url(#metalGrad)" stroke-width="16" />
+    <path d="M-6, -75 L6, -75 L10, -60 L-10, -60 Z 
+             M-6, 75 L6, 75 L10, 60 L-10, 60 Z
+             M-75, -6 L-75, 6 L-60, 10 L-60, -10 Z
+             M 75, -6 L 75, 6 L 60, 10 L 60, -10 Z
+             M-50, -50 L-40, -40 L-32, -48 L-42, -58 Z
+             M 50, 50 L 40, 40 L 32, 48 L 42, 58 Z
+             M-50, 50 L-40, 40 L-32, 48 L-42, 58 Z
+             M 50, -50 L 40, -40 L 32, -48 L 42, -58 Z" fill="url(#metalGrad)"/>
+    <circle cx="0" cy="0" r="45" fill="#0d0e12" stroke="#2c313d" stroke-width="4" />
+
+    <path d="M -15,-25 L -45,-15 L -40,0 L -15,-8 Z" fill="url(#blueNeon)" filter="url(#glowBlue)"/>
+    <path d="M -18,-40 L -48,-30 L -52,-26 L -18,-34 Z" fill="#ffffff" opacity="0.8"/>
+    <path d="M -12,15 L -35,30 L -50,15 L -45,-5" fill="none" stroke="url(#blueNeon)" stroke-width="4" stroke-linejoin="round"/>
+
+    <path d="M 15,-25 L 45,-15 L 40,0 L 15,-8 Z" fill="url(#orangeNeon)" filter="url(#glowOrange)"/>
+    <path d="M 18,-40 L 48,-30 L 52,-26 L 18,-34 Z" fill="#ffffff" opacity="0.8"/>
+    <path d="M 12,15 L 35,30 L 50,15 L 45,-5" fill="none" stroke="url(#orangeNeon)" stroke-width="4" stroke-linejoin="round"/>
+    
+    <path d="M -10,-70 L 15,-30 L -5,-10 L 15,30 L -15,70 L 0,20 L -10,0 Z" fill="#ffffff" filter="url(#glowBlue)"/>
+  </g>
+
+  <path d="M 200,24 L 220,44 L 292,44 L 312,24 Z" fill="#2c313d" />
+  <circle cx="256" cy="34" r="5" fill="#ff3300" filter="url(#glowOrange)" />
+
+  <g transform="translate(116, 415) scale(1.2)">
+    <polygon points="0,10 15,35 215,35 230,10" fill="#12141a" stroke="url(#metalGrad)" stroke-width="2.5" />
+    
+    <path d="M25,16 H34 Q39,16 39,20 Q39,23 35,24 Q40,25 40,29 Q40,33 34,33 H25 Z M29,19 V23 H33 Q35,23 35,21 Q35,19 33,19 Z M29,26 V30 H34 Q36,30 36,28 Q36,26 34,26 Z" fill="#ffffff" />
+    <path d="M52,16 H58 Q64,16 64,24.5 Q64,33 58,33 H52 Q46,33 46,24.5 Q46,16 52,16 Z M53,20 Q50,20 50,24.5 Q50,29 53,29 H57 Q60,29 60,24.5 Q60,20 57,20 Z" fill="#ffffff" />
+    <path d="M70,16 H84 V20 H79 V33 H75 V20 H70 Z" fill="#ffffff" />
+    
+    <path d="M142,16 L147,33 H151 L155,22 L159,33 H163 L168,16 H163 L160,28 L156,16 H153 L149,28 L146,16 Z" fill="url(#orangeNeon)" />
+    <path d="M176,16 H182 L188,33 H183 L182,29 H176 L175,33 H170 Z M177,25 H181 L179,19 Z" fill="url(#orangeNeon)" />
+    <path d="M194,16 H203 Q208,16 208,21 Q208,25 204,26 L209,33 H204 L199,26 H198 V33 H194 Z M198,20 V23 H202 Q204,23 204,21.5 Q204,20 202,20 Z" fill="url(#orangeNeon)" />
+    <path d="M215,19 Q215,16 222,16 Q228,16 228,20 H224 Q224,19 222,19 Q219,19 219,21 Q219,23 223,24 Q229,25 229,29 Q229,33 222,33 Q215,33 215,29 H219 Q219,30 222,30 Q225,30 225,28 Q225,26 221,25 Q215,24 215,19 Z" fill="url(#orangeNeon)" />
+  </g>
 </svg>
