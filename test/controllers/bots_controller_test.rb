@@ -18,6 +18,12 @@ class BotsControllerTest < ActionDispatch::IntegrationTest
     Game.current.bots.create!(name: "bot-#{SecureRandom.hex(4)}", webhook_url: webhook_url)
   end
 
+  test "the add-bot page shows the webhook contract" do
+    get new_bot_path
+    assert_response :success
+    assert_select "h2", text: "Webhook contract"
+  end
+
   test "anyone can register a bot without auth" do
     assert_difference("Bot.count", 1) do
       post bots_path, params: { bot: { name: "Newcomer", webhook_url: "http://127.0.0.1:4000/" } }

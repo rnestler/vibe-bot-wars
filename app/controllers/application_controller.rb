@@ -18,6 +18,14 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  # Called when Basic auth is missing/declined. We still send the WWW-Authenticate
+  # challenge so an operator gets the browser login prompt, but the 401 body bounces
+  # anyone who doesn't log in over to /bots (where they can register a bot).
+  def request_http_basic_authentication(realm = "Bot Wars", _message = nil)
+    response.headers["WWW-Authenticate"] = %(Basic realm="#{realm.tr('"', "")}")
+    render template: "shared/login_required", layout: false, status: :unauthorized
+  end
+
   def admin_username
     ENV.fetch("ARENA_ADMIN_USER", "admin")
   end
