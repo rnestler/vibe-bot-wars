@@ -2,6 +2,8 @@
 
 # Starts and stops matches on the single arena.
 class MatchesController < ApplicationController
+  before_action :require_admin
+
   CONFIG_KEYS = %i[width height gem_count max_ticks tick_ms].freeze
 
   def create

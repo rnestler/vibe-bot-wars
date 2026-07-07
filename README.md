@@ -34,6 +34,23 @@ bin/dev              # starts the web server AND the arena game loop
 
 The game loop **must** run as its own process; without it, matches won't advance.
 
+The web server binds to `0.0.0.0`, so others on the same WiFi/LAN can reach it at
+`http://<your-machine-ip>:3000`. (Development host checking is disabled for this; don't
+run the dev server on an untrusted network.)
+
+## Access control
+
+- The **arena map and match controls** (start/stop) are protected by **HTTP Basic auth**.
+  Credentials come from `ARENA_ADMIN_USER` / `ARENA_ADMIN_PASSWORD` (defaults: `admin` /
+  `botwars`). Set them in the environment for anything beyond a local demo.
+- **Registering** a bot is open to everyone — participants add their own.
+- **Deleting** a bot is operator-only (Basic auth).
+- **Editing** a bot is allowed without a password when the request comes from the same host
+  the bot's webhook points at (i.e. the machine running that bot). Otherwise it falls back
+  to operator auth. This is a convenience for LAN demos, not a hard security boundary — if
+  everyone shares one public IP (NAT), they can edit each other's bots, so keep the operator
+  password for the real gate.
+
 Then, in the UI:
 
 1. **Add a bot** and point its webhook URL at your server — or at the built-in reference

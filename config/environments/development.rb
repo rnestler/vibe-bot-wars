@@ -9,6 +9,10 @@ Rails.application.configure do
   # Make code changes take effect immediately without server restart.
   config.enable_reloading = true
 
+  # Allow reaching the dev server from other devices on the same WiFi/LAN (by IP or
+  # hostname), not just localhost. Fine for a local demo; do not do this in production.
+  config.hosts.clear
+
   # Do not eager load code on boot.
   config.eager_load = false
 

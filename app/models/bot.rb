@@ -6,7 +6,10 @@
 class Bot < ApplicationRecord
   belongs_to :game, default: -> { Game.current }
 
+  before_validation :normalize_webhook_url
+
   validates :name, presence: true, uniqueness: true
+  # A trailing slash (e.g. "http://host:4000/") is fine — \S+ accepts it.
   validates :webhook_url, presence: true,
                           format: { with: %r{\Ahttps?://\S+\z}i, message: "must be an http(s) URL" }
   validates :heading, inclusion: { in: Game::HEADINGS }
@@ -31,5 +34,11 @@ class Bot < ApplicationRecord
   def repair!(amount, max_hp)
     self.hp = [hp + amount, max_hp].min
     self.downed = false if hp.positive?
+  end
+
+  private
+
+  def normalize_webhook_url
+    self.webhook_url = webhook_url.strip if webhook_url.present?
   end
 end
