@@ -20,7 +20,8 @@ module Arena
       assert_equal [[6, 6]], payload[:vision][:gems]
       assert_equal 1, payload[:vision][:bots].size
       assert_equal(
-        { x: 4, y: 5, hp: @game.max_hp, downed: false, group: "group_a", role: "collector" },
+        { x: 4, y: 5, hp: @game.max_hp, max_hp: @near.max_hp, downed: false,
+          group: "group_a", role: "collector" },
         payload[:vision][:bots].first
       )
     end

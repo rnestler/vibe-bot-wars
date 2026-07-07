@@ -60,8 +60,13 @@ Then, in the UI:
 To run an external reference bot in another terminal:
 
 ```bash
-ruby examples/random_bot.rb 4567   # then register webhook http://127.0.0.1:4567/
+ruby examples/random_bot.rb 4567   # simple greedy collector
+ruby examples/smart_bot.rb  4568   # role-aware: plays collector / fighter / healer
 ```
+
+Both listen on all interfaces and print their LAN URL to register. `smart_bot.rb` reads its
+own `role` from each tick and plays it: collectors chase gems and dodge bots, fighters hunt
+and ram enemy collectors, healers shadow wounded allies and `heal` them in range.
 
 ## Webhook contract
 

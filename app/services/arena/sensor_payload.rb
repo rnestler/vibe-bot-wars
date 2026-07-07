@@ -47,7 +47,7 @@ module Arena
 
     def visible_bots
       @others.select { |b| b.placed? && within?(b.x, b.y) }.map do |b|
-        { x: b.x, y: b.y, hp: b.hp, downed: b.downed, group: b.group, role: b.role }
+        { x: b.x, y: b.y, hp: b.hp, max_hp: b.max_hp, downed: b.downed, group: b.group, role: b.role }
       end
     end
   end
