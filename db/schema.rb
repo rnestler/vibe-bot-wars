@@ -10,19 +10,21 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_07_150000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_07_160000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
   create_table "bots", force: :cascade do |t|
     t.boolean "active", default: true, null: false
     t.datetime "created_at", null: false
+    t.integer "damage_dealt", default: 0, null: false
     t.boolean "downed", default: false, null: false
     t.bigint "game_id", null: false
     t.integer "gems_collected", default: 0, null: false
     t.integer "group", default: 0, null: false
     t.string "heading", default: "N", null: false
     t.integer "hp", default: 100, null: false
+    t.integer "hp_restored", default: 0, null: false
     t.string "last_command"
     t.datetime "last_contacted_at"
     t.string "last_error"

@@ -17,12 +17,7 @@
 
     <div class="panel" style="margin-top:20px">
       <h2>Scoreboard</h2>
-      <table class="score">
-        <thead>
-          <tr><th>Bot</th><th>Group</th><th>Role</th><th class="num">Gems</th><th>HP</th><th>Last</th></tr>
-        </thead>
-        <tbody data-arena-target="scoreboard"></tbody>
-      </table>
+      <div data-arena-target="scoreboard"></div>
       <% if @bots.empty? %>
         <p class="muted" style="margin-top:12px">No bots yet. <%= link_to "Register a bot", new_bot_path %> to get started.</p>
       <% end %>

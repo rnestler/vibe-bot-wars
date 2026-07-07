@@ -189,7 +189,9 @@ module Arena
         next if ally == healer || !ally.placed?
         next unless ally.group == healer.group && chebyshev(healer, ally) <= healer.vision_radius
 
+        before = ally.hp
         ally.repair!(@game.heal_amount, ally.max_hp)
+        healer.hp_restored += ally.hp - before # actual HP restored, ignoring overheal
       end
     end
 
@@ -208,8 +210,12 @@ module Arena
     def apply_damage
       @crashers.each { |bot| bot.damage!(@game.wall_damage) }
       # Each bot takes the hardest hit among the bots it collided with; fighters hit harder.
+      # Credit the actual HP lost to whoever landed that hit.
       @collision_opponents.each do |bot, opponents|
-        bot.damage!(opponents.map { |opponent| collision_damage_from(opponent) }.max)
+        dealer = opponents.max_by { |opponent| collision_damage_from(opponent) }
+        before = bot.hp
+        bot.damage!(collision_damage_from(dealer))
+        dealer.damage_dealt += before - bot.hp
       end
     end
 

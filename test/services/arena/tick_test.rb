@@ -82,6 +82,9 @@ module Arena
       # Victim takes the fighter's heavier hit; the fighter takes the collector's normal hit.
       assert_equal @game.max_hp - @game.fighter_collision_damage, victim.hp
       assert_equal @game.fighter_max_hp - @game.collision_damage, fighter.hp
+      # Each side is credited with the damage it actually dealt.
+      assert_equal @game.fighter_collision_damage, fighter.damage_dealt
+      assert_equal @game.collision_damage, victim.damage_dealt
     end
 
     test "only collectors pick up gems; other roles pass over them" do
@@ -97,14 +100,24 @@ module Arena
       assert_includes @game.gems, [6, 5], "the gem stays on the board"
     end
 
-    test "a healer mends same-group allies in range and revives the downed" do
-      place_bot(@game, name: "H", x: 5, y: 5, role: "healer", group: "group_a")
+    test "a healer mends same-group allies in range, revives the downed, and is credited" do
+      healer = place_bot(@game, name: "H", x: 5, y: 5, role: "healer", group: "group_a")
       ally = place_bot(@game, name: "A", x: 6, y: 5, group: "group_a", hp: 0, downed: true)
       Tick.call(@game, client: StubClient.new("H" => { "command" => "heal" }))
       ally.reload
 
       assert_equal @game.heal_amount, ally.hp
       assert_not ally.downed?
+      assert_equal @game.heal_amount, healer.reload.hp_restored
+    end
+
+    test "hp restored counts only real healing, not overheal" do
+      healer = place_bot(@game, name: "H", x: 5, y: 5, role: "healer", group: "group_a")
+      # Ally is 5 HP below max, so only 5 is restored even though heal_amount is larger.
+      place_bot(@game, name: "A", x: 6, y: 5, group: "group_a", hp: @game.max_hp - 5)
+      Tick.call(@game, client: StubClient.new("H" => { "command" => "heal" }))
+
+      assert_equal 5, healer.reload.hp_restored
     end
 
     test "a healer does not heal bots from other groups or out of range" do

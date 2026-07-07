@@ -41,6 +41,7 @@ module Arena
       {
         id: bot.id, name: bot.name, x: bot.x, y: bot.y, heading: bot.heading,
         hp: bot.hp, max_hp: bot.max_hp, gems: bot.gems_collected,
+        damage_dealt: bot.damage_dealt, hp_restored: bot.hp_restored,
         downed: bot.downed, active: bot.active,
         group: bot.group, group_label: bot.group_label, role: bot.role, role_label: bot.role_label,
         last_command: bot.last_command, last_error: bot.last_error

@@ -112,13 +112,37 @@ export default class extends Controller {
     ctx.lineWidth = 1
   }
 
+  // One table per role, each showing only that role's own score column, sorted by group
+  // then by score (highest first).
   updateScoreboard(state) {
     if (!this.hasScoreboardTarget) return
-    const rows = [...(state.bots || [])].sort((a, b) => b.gems - a.gems)
-    this.scoreboardTarget.innerHTML = rows.map((b) => this.scoreRow(b)).join("")
+    const bots = state.bots || []
+    const tables = [
+      { role: "collector", title: "Collectors", metric: "Gems", value: (b) => b.gems || 0 },
+      { role: "fighter", title: "Fighters", metric: "Dmg", value: (b) => b.damage_dealt || 0 },
+      { role: "healer", title: "Healers", metric: "Healed", value: (b) => b.hp_restored || 0 },
+    ]
+    this.scoreboardTarget.innerHTML = tables.map((t) => this.roleTable(t, bots)).join("")
   }
 
-  scoreRow(bot) {
+  roleTable(config, bots) {
+    const rows = bots
+      .filter((b) => b.role === config.role)
+      .sort((a, b) => (a.group || "").localeCompare(b.group || "") || config.value(b) - config.value(a))
+    const body = rows.length
+      ? rows.map((b) => this.scoreRow(b, config.value(b))).join("")
+      : `<tr><td colspan="5" class="muted">No ${config.title.toLowerCase()} yet.</td></tr>`
+    return `
+      <h3 class="score-title">${config.title}</h3>
+      <table class="score">
+        <thead>
+          <tr><th>Bot</th><th>Group</th><th class="num">${config.metric}</th><th>HP</th><th>Last</th></tr>
+        </thead>
+        <tbody>${body}</tbody>
+      </table>`
+  }
+
+  scoreRow(bot, points) {
     const frac = Math.max(0, Math.round((bot.hp / (bot.max_hp || 100)) * 100))
     const status = bot.downed
       ? '<span class="tag tag--downed">downed</span>'
@@ -129,8 +153,7 @@ export default class extends Controller {
       <tr>
         <td><span class="swatch" style="background:${this.botColor(bot.id)}"></span>${this.escape(bot.name)}</td>
         <td>${this.escape(bot.group_label || "—")}</td>
-        <td>${this.escape(bot.role_label || "—")}</td>
-        <td class="num">${bot.gems}</td>
+        <td class="num is-score">${points}</td>
         <td><div class="hpbar"><div class="hpbar__fill" style="width:${frac}%"></div></div></td>
         <td>${status}</td>
       </tr>`

@@ -58,6 +58,10 @@ table.score { width: 100%; border-collapse: collapse; font-size: 14px; }
 table.score th { text-align: left; color: var(--muted); font-weight: 500; padding: 6px 4px; border-bottom: 1px solid var(--border); }
 table.score td { padding: 8px 4px; border-bottom: 1px solid rgba(51,65,85,0.5); vertical-align: middle; }
 table.score td.num { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+table.score tr.is-winner td { background: rgba(74,222,128,0.08); }
+.score-title { font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); margin: 16px 0 6px; }
+.score-title:first-child { margin-top: 0; }
+table.score + .score-title { margin-top: 18px; }
 
 .swatch { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 8px; vertical-align: middle; }
 .hpbar { background: var(--panel-2); border-radius: 4px; height: 8px; overflow: hidden; min-width: 60px; }
