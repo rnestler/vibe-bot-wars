@@ -1,2 +1,14 @@
 inherit_gem:
   renuocop: config/base.yml
+
+Naming/MethodParameterName:
+  Enabled: false
+
+Metrics/ClassLength:
+  Enabled: false
+
+Metrics/MethodLength:
+  Enabled: false
+
+Metrics/CyclomaticComplexity:
+  Enabled: false
