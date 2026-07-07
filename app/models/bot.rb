@@ -8,7 +8,7 @@ class Bot < ApplicationRecord
 
   validates :name, presence: true, uniqueness: true
   validates :webhook_url, presence: true,
-                          format: { with: %r{\Ahttps?://}i, message: "must be an http(s) URL" }
+                          format: { with: %r{\Ahttps?://\S+\z}i, message: "must be an http(s) URL" }
   validates :heading, inclusion: { in: Game::HEADINGS }
 
   scope :active, -> { where(active: true) }
