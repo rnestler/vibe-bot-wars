@@ -19,14 +19,19 @@ module Arena
       assert_equal [[5, 6]], payload[:vision][:walls]
       assert_equal [[6, 6]], payload[:vision][:gems]
       assert_equal 1, payload[:vision][:bots].size
-      assert_equal({ x: 4, y: 5, hp: @game.max_hp, downed: false }, payload[:vision][:bots].first)
+      assert_equal(
+        { x: 4, y: 5, hp: @game.max_hp, downed: false, group: "group_a", role: "collector" },
+        payload[:vision][:bots].first
+      )
     end
 
-    test "self block reports own state and max_hp" do
+    test "self block reports own state, max_hp, group and role" do
       payload = SensorPayload.call(game: @game, bot: @bot, others: [], radius: 1)
       assert_equal 5, payload[:self][:x]
       assert_equal 80, payload[:self][:hp]
-      assert_equal @game.max_hp, payload[:self][:max_hp]
+      assert_equal @bot.max_hp, payload[:self][:max_hp]
+      assert_equal "group_a", payload[:self][:group]
+      assert_equal "collector", payload[:self][:role]
       assert_equal @game.id, payload[:game_id]
     end
 

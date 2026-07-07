@@ -23,6 +23,11 @@
     <%= f.select :group, Bot::GROUP_LABELS.map { |value, label| [label, value] } %>
   </div>
   <div>
+    <%= f.label :role, "Role" %>
+    <%= f.select :role, Bot::ROLE_LABELS.map { |value, label| [label, value] } %>
+    <small class="muted">Collectors gather gems; fighters are tough and hit hard; healers mend same-group allies in range.</small>
+  </div>
+  <div>
     <%= f.label :secret, "Shared secret (optional)" %>
     <%= f.text_field :secret, placeholder: "sent as X-Bot-Secret header" %>
   </div>

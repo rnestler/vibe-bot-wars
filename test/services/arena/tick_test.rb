@@ -70,6 +70,53 @@ module Arena
       assert_equal @game.max_hp - @game.collision_damage, a.hp
     end
 
+    test "a fighter deals more collision damage but takes normal damage back" do
+      fighter = place_bot(@game, name: "F", x: 5, y: 5, role: "fighter",
+                                 max_hp: @game.fighter_max_hp, hp: @game.fighter_max_hp)
+      victim = place_bot(@game, name: "V", x: 6, y: 5) # collector, idles
+      Tick.call(@game, client: StubClient.new("F" => move("E")))
+      fighter.reload
+      victim.reload
+
+      assert_equal [5, 5], fighter.coordinates, "fighter is blocked by the collision"
+      # Victim takes the fighter's heavier hit; the fighter takes the collector's normal hit.
+      assert_equal @game.max_hp - @game.fighter_collision_damage, victim.hp
+      assert_equal @game.fighter_max_hp - @game.collision_damage, fighter.hp
+    end
+
+    test "only collectors pick up gems; other roles pass over them" do
+      @game.update!(gems: [[6, 5]])
+      fighter = place_bot(@game, name: "F", x: 5, y: 5, role: "fighter",
+                                 max_hp: @game.fighter_max_hp, hp: @game.fighter_max_hp)
+      Tick.call(@game, client: StubClient.new("F" => move("E")))
+      fighter.reload
+      @game.reload
+
+      assert_equal [6, 5], fighter.coordinates
+      assert_equal 0, fighter.gems_collected
+      assert_includes @game.gems, [6, 5], "the gem stays on the board"
+    end
+
+    test "a healer mends same-group allies in range and revives the downed" do
+      place_bot(@game, name: "H", x: 5, y: 5, role: "healer", group: "group_a")
+      ally = place_bot(@game, name: "A", x: 6, y: 5, group: "group_a", hp: 0, downed: true)
+      Tick.call(@game, client: StubClient.new("H" => { "command" => "heal" }))
+      ally.reload
+
+      assert_equal @game.heal_amount, ally.hp
+      assert_not ally.downed?
+    end
+
+    test "a healer does not heal bots from other groups or out of range" do
+      place_bot(@game, name: "H", x: 5, y: 5, role: "healer", group: "group_a")
+      enemy = place_bot(@game, name: "E", x: 6, y: 5, group: "group_b", hp: 40)
+      far_ally = place_bot(@game, name: "A", x: 9, y: 9, group: "group_a", hp: 40)
+      Tick.call(@game, client: StubClient.new("H" => { "command" => "heal" }))
+
+      assert_equal 40, enemy.reload.hp, "different group is not healed"
+      assert_equal 40, far_ally.reload.hp, "out-of-range ally is not healed"
+    end
+
     test "collecting a gem scores and respawns to keep the board full" do
       @game.update!(gems: [[6, 5]])
       bot = place_bot(@game, name: "A", x: 5, y: 5)

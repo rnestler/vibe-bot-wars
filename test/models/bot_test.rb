@@ -25,17 +25,23 @@ class BotTest < ActiveSupport::TestCase
     assert_includes dup.errors[:webhook_url].to_s, "device"
   end
 
-  test "defaults to the first group and exposes a label" do
+  test "defaults to the first group and collector role, with labels" do
     bot = @game.bots.new
     assert_equal "group_a", bot.group
-    assert_equal "Group A", bot.group_label
+    assert_equal Bot::GROUP_LABELS.fetch("group_a"), bot.group_label
+    assert_equal "collector", bot.role
+    assert_equal Bot::ROLE_LABELS.fetch("collector"), bot.role_label
   end
 
-  test "can be assigned to any of the three groups" do
-    bot = @game.bots.create!(name: "Grouped", webhook_url: "http://10.0.0.7/", group: "group_c")
-    assert_equal "group_c", bot.reload.group
-    assert_equal "Group C", bot.group_label
+  test "can be assigned to any of the three groups and roles" do
+    bot = @game.bots.create!(name: "Grouped", webhook_url: "http://10.0.0.7/",
+                             group: "group_c", role: "healer")
+    bot.reload
+    assert_equal "group_c", bot.group
+    assert_equal "healer", bot.role
+    assert_equal Bot::GROUP_LABELS.fetch("group_c"), bot.group_label
     assert_equal %w[group_a group_b group_c], Bot.groups.keys
+    assert_equal %w[collector fighter healer], Bot.roles.keys
   end
 
   test "damage floors at zero and downs the bot" do

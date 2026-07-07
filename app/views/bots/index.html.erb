@@ -9,13 +9,14 @@
   <% if @bots.any? %>
     <table class="bots-list">
       <thead>
-        <tr><th>Name</th><th>Group</th><th>Webhook</th><th>State</th><th></th></tr>
+        <tr><th>Name</th><th>Group</th><th>Role</th><th>Webhook</th><th>State</th><th></th></tr>
       </thead>
       <tbody>
         <% @bots.each do |bot| %>
           <tr>
             <td><%= bot.name %><%= " (inactive)" unless bot.active? %></td>
             <td><%= bot.group_label %></td>
+            <td><%= bot.role_label %></td>
             <td class="muted"><%= truncate(bot.webhook_url, length: 42) %></td>
             <td>
               <% if bot.placed? %>

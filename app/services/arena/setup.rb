@@ -41,8 +41,9 @@ module Arena
     def place_bots(walls)
       occupied = walls.to_set
       @game.bots.find_each do |bot|
+        max_hp = role_max_hp(bot)
         bot.assign_attributes(
-          hp: @game.max_hp, downed: false, gems_collected: 0,
+          max_hp: max_hp, hp: max_hp, downed: false, gems_collected: 0,
           heading: Game::HEADINGS.sample, vision_radius: @game.vision_radius,
           last_command: nil, last_error: nil
         )
@@ -67,6 +68,11 @@ module Arena
         occupied << cell
       end
       gems
+    end
+
+    # Fighters are tougher; everyone else uses the game's base max HP.
+    def role_max_hp(bot)
+      bot.fighter? ? @game.fighter_max_hp : @game.max_hp
     end
 
     def all_cells

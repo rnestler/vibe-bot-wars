@@ -14,9 +14,18 @@ class Bot < ApplicationRecord
     "group_c" => "Group C"
   }.freeze
 
+  # Role determines what a bot can do (see Arena::Tick). Only collectors score gems;
+  # fighters are tougher and hit harder; healers mend same-group allies in range.
+  ROLE_LABELS = {
+    "collector" => "Collector",
+    "fighter" => "Fighter",
+    "healer" => "Healer"
+  }.freeze
+
   belongs_to :game, default: -> { Game.current }
 
   enum :group, { group_a: 0, group_b: 1, group_c: 2 }, default: :group_a
+  enum :role, { collector: 0, fighter: 1, healer: 2 }, default: :collector
 
   before_validation :normalize_webhook_url
 
@@ -38,6 +47,11 @@ class Bot < ApplicationRecord
   # Human-readable group name for the UI (see GROUP_LABELS).
   def group_label
     GROUP_LABELS.fetch(group, group)
+  end
+
+  # Human-readable role name for the UI (see ROLE_LABELS).
+  def role_label
+    ROLE_LABELS.fetch(role, role)
   end
 
   def placed?

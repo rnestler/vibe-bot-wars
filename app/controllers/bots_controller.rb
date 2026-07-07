@@ -65,7 +65,7 @@ class BotsController < ApplicationController
   end
 
   def bot_params
-    params.expect(bot: %i[name webhook_url secret active group])
+    params.expect(bot: %i[name webhook_url secret active group role])
   end
 
   def sample_payload

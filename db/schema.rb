@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_07_140000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_07_150000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -26,7 +26,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_07_140000) do
     t.string "last_command"
     t.datetime "last_contacted_at"
     t.string "last_error"
+    t.integer "max_hp", default: 100, null: false
     t.string "name", null: false
+    t.integer "role", default: 0, null: false
     t.string "secret"
     t.datetime "updated_at", null: false
     t.integer "vision_radius", default: 1, null: false
@@ -37,15 +39,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_07_140000) do
     t.index ["game_id"], name: "index_bots_on_game_id"
     t.index ["group"], name: "index_bots_on_group"
     t.index ["name"], name: "index_bots_on_name", unique: true
+    t.index ["role"], name: "index_bots_on_role"
     t.index ["webhook_host"], name: "index_bots_on_webhook_host", unique: true
   end
 
   create_table "games", force: :cascade do |t|
     t.integer "collision_damage", default: 15, null: false
     t.datetime "created_at", null: false
+    t.integer "fighter_collision_damage", default: 30, null: false
+    t.integer "fighter_max_hp", default: 200, null: false
     t.datetime "finished_at"
     t.integer "gem_count", default: 15, null: false
     t.jsonb "gems", default: [], null: false
+    t.integer "heal_amount", default: 15, null: false
     t.integer "height", default: 20, null: false
     t.integer "max_hp", default: 100, null: false
     t.integer "max_ticks", default: 400, null: false

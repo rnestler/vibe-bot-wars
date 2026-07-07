@@ -6,24 +6,31 @@
   "arena": { "width": 20, "height": 20 },
   "self": { "id": 3, "name": "Ada", "x": 5, "y": 7,
             "heading": "N", "hp": 80, "max_hp": 100,
-            "gems": 4, "downed": false },
+            "gems": 4, "downed": false,
+            "group": "group_a", "role": "collector" },
   "vision": {
     "radius": 1,
     "walls": [[5,6]],
     "gems":  [[6,7]],
-    "bots":  [{ "x": 4, "y": 7, "hp": 60, "downed": false }]
+    "bots":  [{ "x": 4, "y": 7, "hp": 60, "downed": false,
+                "group": "group_b", "role": "fighter" }]
   }
 }</pre>
   <p class="muted">Respond within the timeout with one command:</p>
   <pre>{ "command": "move", "dir": "N" }   // N | E | S | W
 { "command": "scan" }               // stay, bigger vision next tick
-{ "command": "repair" }             // stay, heal
+{ "command": "repair" }             // stay, heal yourself
+{ "command": "heal" }               // healers only: mend same-group allies in range
 { "command": "idle" }</pre>
   <p class="muted" style="font-size:12px">
     Vision is a square radius around you (1 by default, larger the tick after a
-    <code>scan</code>). Crashing into a wall or the arena edge, or ramming another
-    bot, costs HP. At 0 HP you're downed and must <code>repair</code> before moving.
-    No/late/invalid response counts as <code>idle</code>. Optional shared secret
-    arrives in the <code>X-Bot-Secret</code> header.
+    <code>scan</code>). Each visible bot reports its <code>group</code> and
+    <code>role</code>. Roles: <b>collector</b> (only role that scores gems),
+    <b>fighter</b> (more HP, deals more collision damage, can't collect),
+    <b>healer</b> (<code>heal</code>s same-group allies within its vision radius,
+    can't collect). Crashing into a wall/edge or ramming a bot costs HP. At 0 HP
+    you're downed and must <code>repair</code> (or be healed) before moving. No/late/
+    invalid response counts as <code>idle</code>. Optional shared secret arrives in the
+    <code>X-Bot-Secret</code> header.
   </p>
 </div>

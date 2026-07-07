@@ -66,6 +66,7 @@ module Arena
         { type: "move", dir: dir }
       when "scan" then { type: "scan" }
       when "repair" then { type: "repair" }
+      when "heal" then { type: "heal" }
       when "idle" then { type: "idle" }
       else { type: "idle", error: "unknown command" }
       end
@@ -82,7 +83,7 @@ module Arena
     # `@collided` (a Set) covers blocked movers and rammed victims.
     def resolve(actions)
       @crashers = []
-      @collided = Set.new
+      @collision_opponents = Hash.new { |hash, bot| hash[bot] = Set.new } # bot => bots it hit
       intents = {} # bot => target [x, y]
 
       @bots.each do |bot|
@@ -90,7 +91,8 @@ module Arena
         next if bot.downed && action[:type] != "repair" # downed bots may only repair
 
         case action[:type]
-        when "repair" then bot.repair!(@game.repair_amount, @game.max_hp)
+        when "repair" then bot.repair!(@game.repair_amount, bot.max_hp)
+        when "heal" then heal_allies(bot)
         when "scan" then bot.vision_radius = @game.scan_radius
         when "move" then classify_move(bot, action[:dir], intents)
         end
@@ -116,7 +118,8 @@ module Arena
     #   - target cell occupied by a bot that is staying put
     #   - two+ movers targeting the same cell
     #   - two movers swapping cells
-    # Survivors get to move; everyone demoted (and any rammed occupant) collides.
+    # Survivors get to move; everyone demoted collides with whoever it ran into, so we
+    # remember those opponents (their role decides how much damage each side takes).
     def settle_conflicts(intents)
       loop do
         occupied = occupied_cells(intents)
@@ -127,14 +130,29 @@ module Arena
         end
         break if bad.empty?
 
+        # Record before deleting; collisions are mutual, so a partner deleted earlier in
+        # this pass has already been linked to everyone it hit.
         bad.each do |bot|
-          victim = @bots.find { |b| !intents.key?(b) && b.coordinates == intents[bot] }
-          @collided << victim if victim
-          @collided << bot
+          record_collision(bot, intents)
           intents.delete(bot)
         end
       end
       intents
+    end
+
+    # Everything `bot` ran into: a staying occupant of its target, other movers aiming
+    # at the same cell, and a swap partner. Collisions are mutual.
+    def record_collision(bot, intents)
+      target = intents[bot]
+      occupant = @bots.find { |b| !intents.key?(b) && b.coordinates == target }
+      same_target = intents.keys.select { |b| b != bot && intents[b] == target }
+      swap_partner = intents.keys.find { |b| b != bot && b.coordinates == target && intents[b] == bot.coordinates }
+
+      opponents = ([occupant, swap_partner] + same_target).compact.uniq
+      opponents.each do |opponent|
+        @collision_opponents[bot] << opponent
+        @collision_opponents[opponent] << bot
+      end
     end
 
     def occupied_cells(intents)
@@ -153,11 +171,30 @@ module Arena
     end
 
     def collect_gem(bot)
+      return unless bot.collector? # only collectors can pick up gems
+
       cell = bot.coordinates
       return unless @gems.delete(cell)
 
       bot.gems_collected += 1
       respawn_gem
+    end
+
+    # A healer mends every same-group ally within its (current) vision radius, reviving
+    # any that were downed. It never heals itself and stays put for the tick.
+    def heal_allies(healer)
+      return unless healer.healer?
+
+      @bots.each do |ally|
+        next if ally == healer || !ally.placed?
+        next unless ally.group == healer.group && chebyshev(healer, ally) <= healer.vision_radius
+
+        ally.repair!(@game.heal_amount, ally.max_hp)
+      end
+    end
+
+    def chebyshev(a, b)
+      [(a.x - b.x).abs, (a.y - b.y).abs].max
     end
 
     def respawn_gem
@@ -170,7 +207,14 @@ module Arena
 
     def apply_damage
       @crashers.each { |bot| bot.damage!(@game.wall_damage) }
-      @collided.each { |bot| bot.damage!(@game.collision_damage) }
+      # Each bot takes the hardest hit among the bots it collided with; fighters hit harder.
+      @collision_opponents.each do |bot, opponents|
+        bot.damage!(opponents.map { |opponent| collision_damage_from(opponent) }.max)
+      end
+    end
+
+    def collision_damage_from(bot)
+      bot.fighter? ? @game.fighter_collision_damage : @game.collision_damage
     end
 
     def advance_clock

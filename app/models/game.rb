@@ -16,6 +16,7 @@ class Game < ApplicationRecord
   validates :status, inclusion: { in: STATUSES }
   validates :width, :height, numericality: { greater_than_or_equal_to: 5 }
   validates :max_ticks, :tick_ms, :gem_count, :scan_radius, :max_hp,
+            :fighter_max_hp, :fighter_collision_damage, :heal_amount,
             numericality: { greater_than: 0 }
   validates :vision_radius, numericality: { greater_than_or_equal_to: 1 }
 

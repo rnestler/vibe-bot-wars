@@ -129,49 +129,44 @@ export default class extends Controller {
       <tr>
         <td><span class="swatch" style="background:${this.botColor(bot.id)}"></span>${this.escape(bot.name)}</td>
         <td>${this.escape(bot.group_label || "—")}</td>
+        <td>${this.escape(bot.role_label || "—")}</td>
         <td class="num">${bot.gems}</td>
         <td><div class="hpbar"><div class="hpbar__fill" style="width:${frac}%"></div></div></td>
         <td>${status}</td>
       </tr>`
   }
 
-  // Overall best bot, best bot per group, and each group's average score. Labels switch
-  // between "leading" (mid-match) and "winner" (finished).
+  // Team scores only: each group ranked by its average gems per bot. Highlights the
+  // leading (or, once finished, winning) group.
   updateResults(state) {
     if (!this.hasResultsTarget) return
-    const finished = state.status === "finished"
-    const bots = state.bots || []
-    const overall = bots.find((b) => b.id === state.overall_best_id)
     const groups = [...(state.groups || [])].sort((a, b) => b.average - a.average)
-
-    if (!overall && groups.every((g) => g.size === 0)) {
+    if (groups.every((g) => g.size === 0)) {
       this.resultsTarget.innerHTML = ""
       return
     }
 
-    const overallLine = overall
-      ? `<span class="swatch" style="background:${this.botColor(overall.id)}"></span>
-         <b>${this.escape(overall.name)}</b> — ${overall.gems} gems`
-      : "—"
-
+    const finished = state.status === "finished"
     const rows = groups
-      .map(
-        (g) => `
-        <tr>
-          <td>${this.escape(g.label)}</td>
-          <td>${g.best_bot_name ? `${this.escape(g.best_bot_name)} (${g.best_bot_gems})` : "—"}</td>
+      .map((g, i) => {
+        const winner = g.key === state.winning_group && g.size > 0
+        return `
+        <tr class="${winner ? "is-winner" : ""}">
+          <td class="num">${i + 1}</td>
+          <td>${this.escape(g.label)}${winner ? ` <span class="tag">${finished ? "winner" : "leading"}</span>` : ""}</td>
           <td class="num">${g.average}</td>
+          <td class="num">${g.total}</td>
           <td class="num">${g.size}</td>
-        </tr>`,
-      )
+        </tr>`
+      })
       .join("")
 
     this.resultsTarget.innerHTML = `
-      <h2>${finished ? "Final results" : "Standings"}</h2>
-      <p class="muted" style="margin:0 0 10px">${finished ? "Winner overall" : "Leading overall"}: ${overallLine}</p>
+      <h2>${finished ? "Final team results" : "Team scores"}</h2>
+      <p class="muted" style="margin:0 0 10px">Score = average gems per bot in the group.</p>
       <table class="score">
         <thead>
-          <tr><th>Group</th><th>${finished ? "Winner" : "Leader"}</th><th class="num">Avg</th><th class="num">Bots</th></tr>
+          <tr><th class="num">#</th><th>Group</th><th class="num">Score</th><th class="num">Gems</th><th class="num">Bots</th></tr>
         </thead>
         <tbody>${rows}</tbody>
       </table>`

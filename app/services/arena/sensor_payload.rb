@@ -23,7 +23,8 @@ module Arena
         arena: { width: @game.width, height: @game.height },
         self: {
           id: @bot.id, name: @bot.name, x: @bot.x, y: @bot.y, heading: @bot.heading,
-          hp: @bot.hp, max_hp: @game.max_hp, gems: @bot.gems_collected, downed: @bot.downed
+          hp: @bot.hp, max_hp: @bot.max_hp, gems: @bot.gems_collected, downed: @bot.downed,
+          group: @bot.group, role: @bot.role
         },
         vision: {
           radius: @radius,
@@ -46,7 +47,7 @@ module Arena
 
     def visible_bots
       @others.select { |b| b.placed? && within?(b.x, b.y) }.map do |b|
-        { x: b.x, y: b.y, hp: b.hp, downed: b.downed }
+        { x: b.x, y: b.y, hp: b.hp, downed: b.downed, group: b.group, role: b.role }
       end
     end
   end
