@@ -15,14 +15,14 @@ module ArenaTestHelpers
       @script = script
     end
 
-    def call(bot, _payload, timeout_ms:)
+    def call(bot, _payload, **)
       Result.new(@script.fetch(bot.name, { "command" => "idle" }), nil)
     end
   end
 
   # Always reports a failed webhook (e.g. timeout).
   class ErrorClient
-    def call(_bot, _payload, timeout_ms:)
+    def call(_bot, _payload, **)
       Result.new(nil, "timeout")
     end
   end

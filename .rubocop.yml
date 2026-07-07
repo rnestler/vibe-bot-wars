@@ -12,3 +12,13 @@ Metrics/MethodLength:
 
 Metrics/CyclomaticComplexity:
   Enabled: false
+
+Metrics/AbcSize:
+  Enabled: false
+
+Metrics/PerceivedComplexity:
+  Enabled: false
+
+# The arena flash/validation strings are user-facing but this app is not localized.
+Rails/I18nLocaleTexts:
+  Enabled: false

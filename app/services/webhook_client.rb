@@ -39,7 +39,7 @@ class WebhookClient
     return Result.new(error: "HTTP #{response.code}") unless response.is_a?(Net::HTTPSuccess)
 
     Result.new(command: JSON.parse(response.body))
-  rescue Net::OpenTimeout, Net::ReadTimeout, Net::WriteTimeout, Timeout::Error
+  rescue Timeout::Error # Net::OpenTimeout/ReadTimeout/WriteTimeout all subclass this
     Result.new(error: "timeout")
   rescue JSON::ParserError
     Result.new(error: "invalid JSON response")
