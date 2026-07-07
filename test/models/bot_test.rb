@@ -25,6 +25,19 @@ class BotTest < ActiveSupport::TestCase
     assert_includes dup.errors[:webhook_url].to_s, "device"
   end
 
+  test "defaults to the first group and exposes a label" do
+    bot = @game.bots.new
+    assert_equal "group_a", bot.group
+    assert_equal "Group A", bot.group_label
+  end
+
+  test "can be assigned to any of the three groups" do
+    bot = @game.bots.create!(name: "Grouped", webhook_url: "http://10.0.0.7/", group: "group_c")
+    assert_equal "group_c", bot.reload.group
+    assert_equal "Group C", bot.group_label
+    assert_equal %w[group_a group_b group_c], Bot.groups.keys
+  end
+
   test "damage floors at zero and downs the bot" do
     bot = @game.bots.new(hp: 12)
     bot.damage!(10)

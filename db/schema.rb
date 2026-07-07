@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_07_130000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_07_140000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -20,6 +20,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_07_130000) do
     t.boolean "downed", default: false, null: false
     t.bigint "game_id", null: false
     t.integer "gems_collected", default: 0, null: false
+    t.integer "group", default: 0, null: false
     t.string "heading", default: "N", null: false
     t.integer "hp", default: 100, null: false
     t.string "last_command"
@@ -34,6 +35,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_07_130000) do
     t.integer "x"
     t.integer "y"
     t.index ["game_id"], name: "index_bots_on_game_id"
+    t.index ["group"], name: "index_bots_on_group"
     t.index ["name"], name: "index_bots_on_name", unique: true
     t.index ["webhook_host"], name: "index_bots_on_webhook_host", unique: true
   end

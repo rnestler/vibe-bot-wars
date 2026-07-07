@@ -19,8 +19,10 @@ Rails.application.configure do
   # Show full error reports.
   config.consider_all_requests_local = true
 
-  # Enable server timing.
-  config.server_timing = true
+  # Server timing is disabled: its middleware interferes with Action Cable's long-lived
+  # WebSocket in development, causing the arena's /cable connection to drop and reconnect
+  # so live broadcasts don't reach the browser.
+  config.server_timing = false
 
   # Enable/disable Action Controller caching. By default Action Controller caching is disabled.
   # Run rails dev:cache to toggle Action Controller caching.

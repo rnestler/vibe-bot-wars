@@ -19,6 +19,7 @@ module Arena
     end
 
     def state
+      results = Results.new(@game)
       {
         status: @game.status,
         tick: @game.tick,
@@ -28,6 +29,8 @@ module Arena
         walls: @game.walls,
         gems: @game.gems,
         winner_bot_id: @game.winner_bot_id,
+        overall_best_id: results.overall_best&.id,
+        groups: results.group_summaries,
         bots: @game.bots.order(:id).map { |bot| bot_state(bot) }
       }
     end
@@ -38,7 +41,7 @@ module Arena
       {
         id: bot.id, name: bot.name, x: bot.x, y: bot.y, heading: bot.heading,
         hp: bot.hp, max_hp: @game.max_hp, gems: bot.gems_collected,
-        downed: bot.downed, active: bot.active,
+        downed: bot.downed, active: bot.active, group: bot.group, group_label: bot.group_label,
         last_command: bot.last_command, last_error: bot.last_error
       }
     end

@@ -5,7 +5,7 @@ import consumer from "channels/consumer"
 // state comes from the server via the `state` value; subsequent ticks arrive over
 // ArenaChannel (broadcast by Arena::Broadcaster).
 export default class extends Controller {
-  static targets = ["canvas", "scoreboard", "tick", "status"]
+  static targets = ["canvas", "scoreboard", "tick", "status", "results"]
   static values = { state: Object }
 
   connect() {
@@ -24,6 +24,7 @@ export default class extends Controller {
     if (!state || !state.width) return
     this.drawGrid(state)
     this.updateScoreboard(state)
+    this.updateResults(state)
     if (this.hasTickTarget) this.tickTarget.textContent = `${state.tick} / ${state.max_ticks}`
     if (this.hasStatusTarget) this.statusTarget.textContent = this.statusLabel(state)
   }
@@ -127,10 +128,53 @@ export default class extends Controller {
     return `
       <tr>
         <td><span class="swatch" style="background:${this.botColor(bot.id)}"></span>${this.escape(bot.name)}</td>
+        <td>${this.escape(bot.group_label || "—")}</td>
         <td class="num">${bot.gems}</td>
         <td><div class="hpbar"><div class="hpbar__fill" style="width:${frac}%"></div></div></td>
         <td>${status}</td>
       </tr>`
+  }
+
+  // Overall best bot, best bot per group, and each group's average score. Labels switch
+  // between "leading" (mid-match) and "winner" (finished).
+  updateResults(state) {
+    if (!this.hasResultsTarget) return
+    const finished = state.status === "finished"
+    const bots = state.bots || []
+    const overall = bots.find((b) => b.id === state.overall_best_id)
+    const groups = [...(state.groups || [])].sort((a, b) => b.average - a.average)
+
+    if (!overall && groups.every((g) => g.size === 0)) {
+      this.resultsTarget.innerHTML = ""
+      return
+    }
+
+    const overallLine = overall
+      ? `<span class="swatch" style="background:${this.botColor(overall.id)}"></span>
+         <b>${this.escape(overall.name)}</b> — ${overall.gems} gems`
+      : "—"
+
+    const rows = groups
+      .map(
+        (g) => `
+        <tr>
+          <td>${this.escape(g.label)}</td>
+          <td>${g.best_bot_name ? `${this.escape(g.best_bot_name)} (${g.best_bot_gems})` : "—"}</td>
+          <td class="num">${g.average}</td>
+          <td class="num">${g.size}</td>
+        </tr>`,
+      )
+      .join("")
+
+    this.resultsTarget.innerHTML = `
+      <h2>${finished ? "Final results" : "Standings"}</h2>
+      <p class="muted" style="margin:0 0 10px">${finished ? "Winner overall" : "Leading overall"}: ${overallLine}</p>
+      <table class="score">
+        <thead>
+          <tr><th>Group</th><th>${finished ? "Winner" : "Leader"}</th><th class="num">Avg</th><th class="num">Bots</th></tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>`
   }
 
   botColor(id) {

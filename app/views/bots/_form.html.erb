@@ -19,6 +19,10 @@
     <small class="muted">Must be your device's IP address. One bot per device.</small>
   </div>
   <div>
+    <%= f.label :group, "Group" %>
+    <%= f.select :group, Bot::GROUP_LABELS.map { |value, label| [label, value] } %>
+  </div>
+  <div>
     <%= f.label :secret, "Shared secret (optional)" %>
     <%= f.text_field :secret, placeholder: "sent as X-Bot-Secret header" %>
   </div>

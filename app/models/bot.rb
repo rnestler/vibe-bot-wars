@@ -6,7 +6,17 @@ require "ipaddr"
 # fields (position, hp, heading, ...) hold its state within the current match and are
 # reset by Arena::Setup on a new match. Registration persists across matches.
 class Bot < ApplicationRecord
+  # Display names for the three groups (one per school class). Rename these labels to
+  # whatever the classes should be called in the UI — the enum keys below stay the same.
+  GROUP_LABELS = {
+    "group_a" => "Group A",
+    "group_b" => "Group B",
+    "group_c" => "Group C"
+  }.freeze
+
   belongs_to :game, default: -> { Game.current }
+
+  enum :group, { group_a: 0, group_b: 1, group_c: 2 }, default: :group_a
 
   before_validation :normalize_webhook_url
 
@@ -23,6 +33,11 @@ class Bot < ApplicationRecord
 
   def coordinates
     [x, y]
+  end
+
+  # Human-readable group name for the UI (see GROUP_LABELS).
+  def group_label
+    GROUP_LABELS.fetch(group, group)
   end
 
   def placed?
