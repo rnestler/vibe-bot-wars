@@ -22,8 +22,8 @@ module Arena
 
       active = game.bots.active
       assert active.all?(&:placed?)
-      assert active.all? { |b| b.hp == game.max_hp }
-      assert active.none? { |b| game.wall?(*b.coordinates) }
+      assert(active.all? { |b| b.hp == game.max_hp })
+      assert(active.none? { |b| game.wall?(*b.coordinates) })
       assert_not inactive.reload.placed?
     end
 
@@ -34,11 +34,11 @@ module Arena
       Setup.call(game)
       game.reload
 
-      walls = game.walls.map { |c| [c[0], c[1]] }.to_set
+      walls = game.walls.to_set { |c| [c[0], c[1]] }
       assert(game.gems.none? { |g| walls.include?(g) })
       occupied = game.bots.active.map(&:coordinates)
       assert_equal occupied.uniq.size, occupied.size, "bots overlap"
-      assert (occupied & game.gems).empty?, "bot spawned on a gem"
+      assert_not occupied.intersect?(game.gems), "bot spawned on a gem"
     end
   end
 end

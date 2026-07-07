@@ -138,7 +138,7 @@ module Arena
     end
 
     def occupied_cells(intents)
-      @bots.reject { |bot| intents.key?(bot) }.map(&:coordinates).to_set
+      @bots.reject { |bot| intents.key?(bot) }.to_set(&:coordinates)
     end
 
     def swapping?(bot, intents)
@@ -161,7 +161,7 @@ module Arena
     end
 
     def respawn_gem
-      occupied = @game.walls.map { |c| [c[0], c[1]] }.to_set
+      occupied = @game.walls.to_set { |c| [c[0], c[1]] }
       @bots.each { |b| occupied << b.coordinates if b.placed? }
       @gems.each { |c| occupied << c }
       free = (0...@game.width).to_a.product((0...@game.height).to_a) - occupied.to_a

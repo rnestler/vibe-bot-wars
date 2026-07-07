@@ -25,7 +25,7 @@ class DemoBotController < ApplicationController
     gems = vision["gems"] || []
     if gems.any?
       { command: "move", dir: step_toward(me, nearest(me, gems), vision) }
-    elsif (vision["radius"]).to_i <= 1
+    elsif vision["radius"].to_i <= 1
       { command: "scan" } # look further before committing to a direction
     else
       { command: "move", dir: safe_random_dir(me, vision) }
@@ -43,7 +43,7 @@ class DemoBotController < ApplicationController
     candidates << (tx > me["x"] ? "E" : "W") if tx != me["x"]
     candidates << (ty > me["y"] ? "S" : "N") if ty != me["y"]
     candidates.sort_by! { |dir| axis_distance(dir, me, target) }.reverse!
-    (candidates.find { |dir| !blocked?(me, dir, vision) } || candidates.first || "N")
+    candidates.find { |dir| !blocked?(me, dir, vision) } || candidates.first || "N"
   end
 
   def axis_distance(dir, me, target)

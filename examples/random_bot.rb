@@ -56,7 +56,7 @@ def read_request(client)
   length = 0
   while (line = client.gets) && line != "\r\n"
     key, value = line.split(":", 2)
-    length = value.to_i if value && key.strip.downcase == "content-length"
+    length = value.to_i if value && key.strip.casecmp("content-length").zero?
   end
   length.positive? ? client.read(length).to_s : ""
 end

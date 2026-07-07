@@ -20,7 +20,7 @@ class BotsController < ApplicationController
     if @bot.save
       redirect_to bots_path, notice: "Bot registered."
     else
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 
@@ -28,7 +28,7 @@ class BotsController < ApplicationController
     if @bot.update(bot_params)
       redirect_to bots_path, notice: "Bot updated."
     else
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 
@@ -41,21 +41,21 @@ class BotsController < ApplicationController
   def test
     result = WebhookClient.call(@bot, sample_payload, timeout_ms: Game.current.webhook_timeout_ms)
     flash[:notice] = if result.ok?
-      "Webhook responded: #{result.command.inspect}"
-    else
-      "Webhook error: #{result.error}"
-    end
+                       "Webhook responded: #{result.command.inspect}"
+                     else
+                       "Webhook error: #{result.error}"
+                     end
     redirect_to bots_path
   end
 
   private
 
   def set_bot
-    @bot = Game.current.bots.find(params[:id])
+    @bot = Game.current.bots.find(params.expect(:id))
   end
 
   def bot_params
-    params.require(:bot).permit(:name, :webhook_url, :secret, :active)
+    params.expect(bot: %i[name webhook_url secret active])
   end
 
   def sample_payload

@@ -18,7 +18,7 @@ class Bot < ApplicationRecord
   end
 
   def placed?
-    !x.nil? && !y.nil?
+    x && y
   end
 
   # Applies damage, flooring HP at 0 and marking the bot as downed when it hits 0.

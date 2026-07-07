@@ -11,7 +11,7 @@ require "json"
 # Note: instances touch no ActiveRecord, so this is safe to call from the tick
 # engine's per-bot threads (only loaded attributes + the passed timeout are used).
 class WebhookClient
-  Result = Struct.new(:command, :error, keyword_init: true) do
+  Result = Struct.new(:command, :error) do
     def ok?
       error.nil?
     end

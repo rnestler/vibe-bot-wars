@@ -7,7 +7,7 @@ class DemoBotControllerTest < ActionDispatch::IntegrationTest
 
   def ask(payload)
     post demo_bot_path, params: payload.to_json, headers: { "Content-Type" => "application/json" }
-    JSON.parse(response.body)
+    response.parsed_body
   end
 
   test "moves toward the nearest visible gem" do
@@ -37,6 +37,6 @@ class DemoBotControllerTest < ActionDispatch::IntegrationTest
 
   test "invalid JSON yields idle" do
     post demo_bot_path, params: "not json", headers: { "Content-Type" => "application/json" }
-    assert_equal({ "command" => "idle" }, JSON.parse(response.body))
+    assert_equal({ "command" => "idle" }, response.parsed_body)
   end
 end
