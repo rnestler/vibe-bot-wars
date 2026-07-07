@@ -9,8 +9,8 @@ class Bot < ApplicationRecord
   # Display names for the three groups (one per school class). Rename these labels to
   # whatever the classes should be called in the UI — the enum keys below stay the same.
   GROUP_LABELS = {
-    "group_a" => "Group A",
-    "group_b" => "Group B",
+    "group_a" => "KSH 23a",
+    "group_b" => "KBW 23a",
     "group_c" => "Group C"
   }.freeze
 
