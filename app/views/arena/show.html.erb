@@ -1,0 +1,84 @@
+<% content_for :title, "Arena — Vibe Bot Wars" %>
+
+<div class="layout"
+     data-controller="arena"
+     data-arena-state-value="<%= @state.to_json %>">
+  <div>
+    <div class="panel">
+      <div class="statline">
+        <div>Status: <b data-arena-target="status">—</b></div>
+        <div>Tick: <b data-arena-target="tick">—</b></div>
+        <div class="muted"><%= @game.width %>×<%= @game.height %> grid · <%= pluralize(@bots.count, "bot") %></div>
+      </div>
+      <div class="arena-canvas-wrap">
+        <canvas data-arena-target="canvas" width="520" height="520"></canvas>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:20px">
+      <h2>Scoreboard</h2>
+      <table class="score">
+        <thead>
+          <tr><th>Bot</th><th class="num">Gems</th><th>HP</th><th>Last</th></tr>
+        </thead>
+        <tbody data-arena-target="scoreboard"></tbody>
+      </table>
+      <% if @bots.empty? %>
+        <p class="muted" style="margin-top:12px">No bots yet. <%= link_to "Register a bot", new_bot_path %> to get started.</p>
+      <% end %>
+    </div>
+  </div>
+
+  <aside>
+    <div class="panel">
+      <h2>Match</h2>
+      <%= form_with url: start_match_path, method: :post, class: "controls" do |f| %>
+        <div class="row">
+          <div>
+            <label>Width</label>
+            <%= number_field_tag :width, @game.width, min: 5, max: 60 %>
+          </div>
+          <div>
+            <label>Height</label>
+            <%= number_field_tag :height, @game.height, min: 5, max: 60 %>
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Gems</label>
+            <%= number_field_tag :gem_count, @game.gem_count, min: 1, max: 200 %>
+          </div>
+          <div>
+            <label>Max ticks</label>
+            <%= number_field_tag :max_ticks, @game.max_ticks, min: 1, max: 10000 %>
+          </div>
+        </div>
+        <div>
+          <label>Tick interval (ms)</label>
+          <%= number_field_tag :tick_ms, @game.tick_ms, min: 100, max: 5000, step: 50 %>
+        </div>
+        <div class="btn-row">
+          <%= f.submit "New match", class: "btn btn--primary" %>
+          <%= button_to "Stop", stop_match_path, method: :post, class: "btn btn--ghost" %>
+        </div>
+      <% end %>
+      <p class="muted" style="margin-top:10px;font-size:13px">
+        The <code>arena:run</code> process ticks every <%= @game.tick_ms %> ms while a match is running.
+      </p>
+    </div>
+
+    <div class="panel" style="margin-top:20px">
+      <h2>Bots</h2>
+      <div class="btn-row" style="margin-bottom:10px">
+        <%= link_to "Manage bots", bots_path, class: "btn btn--ghost" %>
+        <%= link_to "Add bot", new_bot_path, class: "btn btn--ghost" %>
+      </div>
+      <p class="muted" style="font-size:13px">
+        Point a bot's webhook at your own server, or at
+        <code><%= demo_bot_url %></code> to use the built-in reference bot.
+      </p>
+    </div>
+
+    <%= render "arena/contract" %>
+  </aside>
+</div>

@@ -1,0 +1,42 @@
+<% content_for :title, "Bots — Vibe Bot Wars" %>
+
+<div class="panel">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+    <h2 style="margin:0">Registered bots</h2>
+    <%= link_to "Add bot", new_bot_path, class: "btn btn--primary" %>
+  </div>
+
+  <% if @bots.any? %>
+    <table class="bots-list">
+      <thead>
+        <tr><th>Name</th><th>Webhook</th><th>State</th><th></th></tr>
+      </thead>
+      <tbody>
+        <% @bots.each do |bot| %>
+          <tr>
+            <td><%= bot.name %><%= " (inactive)" unless bot.active? %></td>
+            <td class="muted"><%= truncate(bot.webhook_url, length: 42) %></td>
+            <td>
+              <% if bot.placed? %>
+                <%= bot.coordinates.inspect %> · <%= bot.hp %> hp<%= bot.downed? ? " · downed" : "" %>
+              <% else %>
+                <span class="muted">—</span>
+              <% end %>
+              <% if bot.last_error.present? %>
+                <span class="tag tag--error"><%= bot.last_error %></span>
+              <% end %>
+            </td>
+            <td class="actions">
+              <%= button_to "Test", test_bot_path(bot), method: :post, class: "btn btn--ghost" %>
+              <%= link_to "Edit", edit_bot_path(bot), class: "btn btn--ghost" %>
+              <%= button_to "Remove", bot_path(bot), method: :delete, class: "btn btn--danger",
+                    form: { data: { turbo_confirm: "Remove #{bot.name}?" } } %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% else %>
+    <p class="muted">No bots registered yet.</p>
+  <% end %>
+</div>

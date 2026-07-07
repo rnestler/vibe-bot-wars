@@ -24,6 +24,20 @@
   </head>
 
   <body>
-    <%= yield %>
+    <div class="wrap">
+      <header class="topbar">
+        <h1><%= link_to raw("Vibe <span>Bot Wars</span>"), root_path, style: "color:inherit;text-decoration:none" %></h1>
+        <nav>
+          <%= link_to "Arena", root_path %>
+          <%= link_to "Bots", bots_path %>
+        </nav>
+      </header>
+
+      <% flash.each do |type, message| %>
+        <div class="flash flash--<%= type == "alert" ? "alert" : "notice" %>"><%= message %></div>
+      <% end %>
+
+      <%= yield %>
+    </div>
   </body>
 </html>

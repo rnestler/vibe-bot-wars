@@ -1,0 +1,29 @@
+<div class="panel contract" style="margin-top:20px">
+  <h2>Webhook contract</h2>
+  <p class="muted">Each tick, the game <code>POST</code>s this JSON to a bot's webhook URL:</p>
+  <pre>{
+  "game_id": 1, "tick": 42,
+  "arena": { "width": 20, "height": 20 },
+  "self": { "id": 3, "name": "Ada", "x": 5, "y": 7,
+            "heading": "N", "hp": 80, "max_hp": 100,
+            "gems": 4, "downed": false },
+  "vision": {
+    "radius": 1,
+    "walls": [[5,6]],
+    "gems":  [[6,7]],
+    "bots":  [{ "x": 4, "y": 7, "hp": 60, "downed": false }]
+  }
+}</pre>
+  <p class="muted">Respond within the timeout with one command:</p>
+  <pre>{ "command": "move", "dir": "N" }   // N | E | S | W
+{ "command": "scan" }               // stay, bigger vision next tick
+{ "command": "repair" }             // stay, heal
+{ "command": "idle" }</pre>
+  <p class="muted" style="font-size:12px">
+    Vision is a square radius around you (1 by default, larger the tick after a
+    <code>scan</code>). Crashing into a wall or the arena edge, or ramming another
+    bot, costs HP. At 0 HP you're downed and must <code>repair</code> before moving.
+    No/late/invalid response counts as <code>idle</code>. Optional shared secret
+    arrives in the <code>X-Bot-Secret</code> header.
+  </p>
+</div>

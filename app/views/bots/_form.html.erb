@@ -1,0 +1,31 @@
+<%= form_with model: bot, class: "controls" do |f| %>
+  <% if bot.errors.any? %>
+    <div class="errors">
+      <ul>
+        <% bot.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= f.label :name %>
+    <%= f.text_field :name, autofocus: true, placeholder: "Ada" %>
+  </div>
+  <div>
+    <%= f.label :webhook_url, "Webhook URL" %>
+    <%= f.url_field :webhook_url, placeholder: "https://my-bot.example.com/tick" %>
+  </div>
+  <div>
+    <%= f.label :secret, "Shared secret (optional)" %>
+    <%= f.text_field :secret, placeholder: "sent as X-Bot-Secret header" %>
+  </div>
+  <div>
+    <label><%= f.check_box :active %> Active (participates in matches)</label>
+  </div>
+  <div class="btn-row">
+    <%= f.submit class: "btn btn--primary" %>
+    <%= link_to "Cancel", bots_path, class: "btn btn--ghost" %>
+  </div>
+<% end %>

@@ -1,16 +1,21 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+  # Live arena (the home page).
+  root "arena#show"
 
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
+  # Registered bots: name + webhook URL. `test` probes the webhook once.
+  resources :bots do
+    member { post :test }
+  end
+
+  # Match lifecycle: start (new match, resets the arena) and stop.
+  post "match/start" => "matches#create", as: :start_match
+  post "match/stop" => "matches#stop", as: :stop_match
+
+  # Built-in sample bot so a match can run end-to-end without any external server.
+  post "demo_bot" => "demo_bot#respond", as: :demo_bot
+
+  # Health check for load balancers / uptime monitors.
   get "up" => "rails/health#show", as: :rails_health_check
-
-  # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
-  # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
-  # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
-
-  # Defines the root path route ("/")
-  # root "posts#index"
 end

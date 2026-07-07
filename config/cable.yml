@@ -2,8 +2,13 @@
 # and seeing results in the browser, you must do so from the web console (running inside the dev process),
 # not a terminal started via bin/rails console! Add "console" to any action or any ERB template view
 # to make the web console appear.
+# Solid Cable (backed by the primary DB) rather than :async, so broadcasts made
+# from the separate `arena:run` game-loop process reach browsers connected to the
+# web process. :async only works within a single process.
 development:
-  adapter: async
+  adapter: solid_cable
+  polling_interval: 0.1.seconds
+  message_retention: 1.day
 
 test:
   adapter: test

@@ -1,2 +1,25 @@
 #!/usr/bin/env ruby
-exec "./bin/rails", "server", *ARGV
+# frozen_string_literal: true
+
+# Boots the web server and the real-time arena game loop together (see Procfile.dev)
+# using foreman. The game loop (`arena:run`) must run as its own process so the arena
+# ticks in real time independently of web requests.
+
+APP_ROOT = File.expand_path("..", __dir__)
+Dir.chdir(APP_ROOT) do
+  if system("foreman --version", %i[out err] => File::NULL)
+    exec "foreman start -f Procfile.dev #{ARGV.join(' ')}"
+  else
+    warn <<~MSG
+      foreman is not installed. Install it with:
+
+          gem install foreman
+
+      Then run bin/dev again. (Or start the two processes manually in separate terminals:
+          bin/rails server
+          bin/rake arena:run
+      )
+    MSG
+    exit 1
+  end
+end
