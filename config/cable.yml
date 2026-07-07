@@ -7,6 +7,9 @@
 # web process. :async only works within a single process.
 development:
   adapter: solid_cable
+  connects_to:
+    database:
+      writing: primary
   polling_interval: 0.1.seconds
   message_retention: 1.day
 
@@ -17,6 +20,6 @@ production:
   adapter: solid_cable
   connects_to:
     database:
-      writing: cable
+      writing: primary
   polling_interval: 0.1.seconds
   message_retention: 1.day
