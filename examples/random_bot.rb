@@ -72,16 +72,25 @@ end
 server = TCPServer.new("0.0.0.0", PORT)
 puts "random_bot listening on http://#{local_ip}:#{PORT}/  (Ctrl-C to stop)"
 
+def log(direction, data)
+  # Standalone script: no ActiveSupport, so Time.now (not Time.current) is correct here.
+  puts "#{Time.now.strftime("%H:%M:%S")} #{direction} #{data}" # rubocop:disable Rails/TimeZone
+end
+
 loop do
   client = server.accept
   body = read_request(client)
   command =
     begin
-      decide(JSON.parse(body))
+      payload = JSON.parse(body)
+      log("in  <-", JSON.generate(payload))
+      decide(payload)
     rescue JSON::ParserError
+      log("in  <-", "invalid JSON: #{body.inspect}")
       { command: "idle" }
     end
   json = JSON.generate(command)
+  log("out ->", json)
   client.write "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n" \
                "Content-Length: #{json.bytesize}\r\nConnection: close\r\n\r\n#{json}"
   client.close
