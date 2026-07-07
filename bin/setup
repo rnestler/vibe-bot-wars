@@ -15,17 +15,10 @@ FileUtils.chdir APP_ROOT do
   puts "== Installing dependencies =="
   system("bundle check") || system!("bundle install")
 
-  # puts "\n== Copying sample files =="
-  # unless File.exist?("config/database.yml")
-  #   FileUtils.cp "config/database.yml.sample", "config/database.yml"
-  # end
-  puts "\n== Fetching 1password dependencies =="
-  system! 'renuo fetch-secrets'
-    puts "
-== Copying sample files =="
-    unless File.exist?('.env')
-      system! 'cp .env.example .env'
-    end
+  puts "== Copying sample files =="
+  unless File.exist?(".env")
+    system! "cp .env.example .env"
+  end
 
   puts "\n== Preparing database =="
   system! "bin/rails db:setup"
