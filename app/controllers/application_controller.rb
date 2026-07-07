@@ -34,23 +34,12 @@ class ApplicationController < ActionController::Base
     ENV.fetch("ARENA_ADMIN_PASSWORD", "botwars")
   end
 
-  # True when the request comes from the same host the bot's webhook points at, i.e. the
-  # machine running that bot's server. Lets a participant edit their own bot without the
-  # operator password. Only the URL host matters, so trailing slashes are irrelevant.
-  # DNS/resolution failures (or an unreachable name) simply fall through to admin auth.
+  # True when the request comes from the same device the bot's webhook points at (its IP
+  # matches the request's). Lets a participant edit their own bot without the operator
+  # password; any other request falls through to admin auth.
   def request_from_webhook_host?(bot)
-    host = URI.parse(bot.webhook_url.to_s.strip).host
-    return false if host.blank?
-
-    webhook_ips(host).include?(request.remote_ip)
-  rescue URI::InvalidURIError
+    bot.webhook_host.present? && IPAddr.new(bot.webhook_host) == IPAddr.new(request.remote_ip)
+  rescue IPAddr::InvalidAddressError
     false
-  end
-
-  def webhook_ips(host)
-    require "resolv"
-    ([host] + Resolv.getaddresses(host)).uniq
-  rescue StandardError
-    [host]
   end
 end

@@ -36,7 +36,8 @@ module ArenaTestHelpers
 
   def place_bot(game, name:, x:, y:, **attrs)
     game.bots.create!({
-      name: name, webhook_url: "http://example.test/", x: x, y: y,
+      # A unique per-device (per-IP) webhook, as the model now requires.
+      name: name, webhook_url: "http://10.0.0.#{game.bots.count + 1}:4567/", x: x, y: y,
       hp: game.max_hp, heading: "N", vision_radius: game.vision_radius
     }.merge(attrs))
   end

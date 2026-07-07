@@ -8,9 +8,9 @@ module Arena
 
     test "starts a match: places active bots, spawns gems, marks running" do
       game = Game.create!(width: 12, height: 12, gem_count: 8)
-      game.bots.create!(name: "A", webhook_url: "http://x/")
-      game.bots.create!(name: "B", webhook_url: "http://x/")
-      inactive = game.bots.create!(name: "C", webhook_url: "http://x/", active: false)
+      game.bots.create!(name: "A", webhook_url: "http://10.0.0.1/")
+      game.bots.create!(name: "B", webhook_url: "http://10.0.0.2/")
+      inactive = game.bots.create!(name: "C", webhook_url: "http://10.0.0.3/", active: false)
 
       Setup.call(game)
       game.reload
@@ -29,7 +29,7 @@ module Arena
 
     test "bots and gems never share a wall cell" do
       game = Game.create!(width: 10, height: 10, gem_count: 10)
-      3.times { |i| game.bots.create!(name: "B#{i}", webhook_url: "http://x/") }
+      3.times { |i| game.bots.create!(name: "B#{i}", webhook_url: "http://10.0.0.#{i + 1}/") }
 
       Setup.call(game)
       game.reload

@@ -10,8 +10,12 @@ require "test_helper"
 class BotsControllerTest < ActionDispatch::IntegrationTest
   setup { host! "localhost" }
 
+  # Use the same credentials the controller expects, so the test passes whether or not
+  # ARENA_ADMIN_USER/PASSWORD are overridden in the environment (e.g. via .env).
   def admin_headers
-    { "HTTP_AUTHORIZATION" => ActionController::HttpAuthentication::Basic.encode_credentials("admin", "botwars") }
+    user = ENV.fetch("ARENA_ADMIN_USER", "admin")
+    password = ENV.fetch("ARENA_ADMIN_PASSWORD", "botwars")
+    { "HTTP_AUTHORIZATION" => ActionController::HttpAuthentication::Basic.encode_credentials(user, password) }
   end
 
   def create_bot(webhook_url)
