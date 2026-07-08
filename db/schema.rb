@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_07_160000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_08_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -25,6 +25,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_07_160000) do
     t.string "heading", default: "N", null: false
     t.integer "hp", default: 100, null: false
     t.integer "hp_restored", default: 0, null: false
+    t.integer "lamed_ticks", default: 0, null: false
     t.string "last_command"
     t.datetime "last_contacted_at"
     t.string "last_error"
@@ -55,6 +56,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_07_160000) do
     t.jsonb "gems", default: [], null: false
     t.integer "heal_amount", default: 15, null: false
     t.integer "height", default: 20, null: false
+    t.integer "lame_ticks", default: 10, null: false
     t.integer "max_hp", default: 100, null: false
     t.integer "max_ticks", default: 400, null: false
     t.integer "repair_amount", default: 20, null: false

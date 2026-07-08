@@ -63,10 +63,14 @@ class Bot < ApplicationRecord
     self.downed = true if hp.zero?
   end
 
-  # Heals up to max_hp; a bot that recovers above 0 HP is no longer downed.
+  # Heals up to max_hp. A bot brought above 0 HP is no longer downed, and its lame timer
+  # is cleared — this is how a healer can revive a lamed ally early.
   def repair!(amount, max_hp)
     self.hp = [hp + amount, max_hp].min
-    self.downed = false if hp.positive?
+    return unless hp.positive?
+
+    self.downed = false
+    self.lamed_ticks = 0
   end
 
   private

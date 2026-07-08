@@ -23,7 +23,8 @@ module Arena
         arena: { width: @game.width, height: @game.height },
         self: {
           id: @bot.id, name: @bot.name, x: @bot.x, y: @bot.y, heading: @bot.heading,
-          hp: @bot.hp, max_hp: @bot.max_hp, gems: @bot.gems_collected, downed: @bot.downed,
+          hp: @bot.hp, max_hp: @bot.max_hp, gems: @bot.gems_collected,
+          downed: @bot.downed, lamed_ticks: @bot.lamed_ticks,
           group: @bot.group, role: @bot.role
         },
         vision: {

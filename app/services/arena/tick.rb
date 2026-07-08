@@ -93,10 +93,15 @@ module Arena
       @collision_cells = Set.new # contested cells, for the UI highlight
       intents = {} # bot => target [x, y]
 
-      @bots.each do |bot|
-        action = actions[bot]
-        next if bot.downed && action[:type] != "repair" # downed bots may only repair
+      advance_lame_states # count down / revive lamed bots before they may act
 
+      @bots.each do |bot|
+        if bot.downed
+          bot.last_command = "lamed" # lamed bots take no action at all
+          next
+        end
+
+        action = actions[bot]
         case action[:type]
         when "repair" then bot.repair!(@game.repair_amount, bot.max_hp)
         when "heal" then heal_allies(bot)
@@ -108,6 +113,26 @@ module Arena
       movers = settle_conflicts(intents)
       apply_moves(movers)
       apply_damage
+    end
+
+    # A lamed bot is out of action until its timer runs out, then it revives at 1 HP.
+    # (Healers can cut this short by healing it above 0 first — see Bot#repair!.)
+    def advance_lame_states
+      @bots.each do |bot|
+        next unless bot.downed
+
+        if bot.lamed_ticks <= 0
+          revive(bot)
+        else
+          bot.lamed_ticks -= 1
+        end
+      end
+    end
+
+    def revive(bot)
+      bot.hp = 1
+      bot.downed = false
+      bot.lamed_ticks = 0
     end
 
     def classify_move(bot, dir, intents)
@@ -216,7 +241,11 @@ module Arena
     end
 
     def apply_damage
-      @crashers.each { |bot| bot.damage!(@game.wall_damage) }
+      @crashers.each do |bot|
+        before = bot.hp
+        bot.damage!(@game.wall_damage)
+        start_lame(bot) if before.positive? && bot.hp.zero?
+      end
       # Each bot takes the hardest hit among the bots it collided with; fighters hit harder.
       # Credit the actual HP lost to whoever landed that hit.
       @collision_opponents.each do |bot, opponents|
@@ -224,7 +253,13 @@ module Arena
         before = bot.hp
         bot.damage!(collision_damage_from(dealer))
         dealer.damage_dealt += before - bot.hp
+        start_lame(bot) if before.positive? && bot.hp.zero?
       end
+    end
+
+    # Begins the lame timer the moment a bot is knocked to 0 (not on later hits while down).
+    def start_lame(bot)
+      bot.lamed_ticks = @game.lame_ticks
     end
 
     def collision_damage_from(bot)

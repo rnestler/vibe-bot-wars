@@ -203,7 +203,7 @@ export default class extends Controller {
   scoreRow(bot, points) {
     const frac = Math.max(0, Math.round((bot.hp / (bot.max_hp || 100)) * 100))
     const status = bot.downed
-      ? '<span class="tag tag--downed">downed</span>'
+      ? `<span class="tag tag--downed">lamed ${bot.lamed_ticks}</span>`
       : bot.last_error
         ? `<span class="tag tag--error" title="${this.escape(bot.last_error)}">error</span>`
         : `<span class="tag">${this.escape(bot.last_command || "—")}</span>`

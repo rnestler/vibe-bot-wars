@@ -6,7 +6,7 @@
   "arena": { "width": 20, "height": 20 },
   "self": { "id": 3, "name": "Ada", "x": 5, "y": 7,
             "heading": "N", "hp": 80, "max_hp": 100,
-            "gems": 4, "downed": false,
+            "gems": 4, "downed": false, "lamed_ticks": 0,
             "group": "group_a", "role": "collector" },
   "vision": {
     "radius": 1,
@@ -28,8 +28,9 @@
     <code>role</code>. Roles: <b>collector</b> (only role that scores gems),
     <b>fighter</b> (more HP, deals more collision damage, can't collect),
     <b>healer</b> (<code>heal</code>s same-group allies within its vision radius,
-    can't collect). Crashing into a wall/edge or ramming a bot costs HP. At 0 HP
-    you're downed and must <code>repair</code> (or be healed) before moving. No/late/
+    can't collect). Crashing into a wall/edge or ramming a bot costs HP. At 0 HP you're
+    <b>lamed</b>: out of action for <code>lamed_ticks</code> ticks (any commands ignored),
+    then you revive at 1 HP — a healer can revive you sooner by healing you above 0. No/late/
     invalid response counts as <code>idle</code>. Optional shared secret arrives in the
     <code>X-Bot-Secret</code> header.
   </p>

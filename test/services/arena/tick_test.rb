@@ -136,14 +136,15 @@ module Arena
       assert_includes @game.gems, [6, 5], "the gem stays on the board"
     end
 
-    test "a healer mends same-group allies in range, revives the downed, and is credited" do
+    test "a healer heals same-group allies in range and revives a lamed ally early" do
       healer = place_bot(@game, name: "H", x: 5, y: 5, role: "healer", group: "group_a")
-      ally = place_bot(@game, name: "A", x: 6, y: 5, group: "group_a", hp: 0, downed: true)
+      ally = place_bot(@game, name: "A", x: 6, y: 5, group: "group_a", hp: 0, downed: true, lamed_ticks: 8)
       Tick.call(@game, client: StubClient.new("H" => { "command" => "heal" }))
       ally.reload
 
       assert_equal @game.heal_amount, ally.hp
-      assert_not ally.downed?
+      assert_not ally.downed?, "healing above 0 ends the lame"
+      assert_equal 0, ally.lamed_ticks
       assert_equal @game.heal_amount, healer.reload.hp_restored
     end
 
@@ -178,21 +179,32 @@ module Arena
       assert_not_includes @game.gems, [6, 5]
     end
 
-    test "repair heals and revives a downed bot" do
-      bot = place_bot(@game, name: "A", x: 5, y: 5, hp: 0, downed: true)
-      Tick.call(@game, client: StubClient.new("A" => { "command" => "repair" }))
+    test "hitting zero HP lames the bot for the configured number of ticks" do
+      bot = place_bot(@game, name: "A", x: 0, y: 5, hp: 5) # weak bot at the west edge
+      Tick.call(@game, client: StubClient.new("A" => move("W"))) # crashes off-grid
       bot.reload
-      assert_equal @game.repair_amount, bot.hp
-      assert_not bot.downed?
+      assert_equal 0, bot.hp
+      assert bot.downed?
+      assert_equal @game.lame_ticks, bot.lamed_ticks
     end
 
-    test "a downed bot cannot move" do
-      bot = place_bot(@game, name: "A", x: 5, y: 5, hp: 0, downed: true)
+    test "a lamed bot ignores commands, stays put, and counts down" do
+      bot = place_bot(@game, name: "A", x: 5, y: 5, hp: 0, downed: true, lamed_ticks: 3)
       Tick.call(@game, client: StubClient.new("A" => move("E")))
       bot.reload
       assert_equal [5, 5], bot.coordinates
       assert_equal 0, bot.hp
       assert bot.downed?
+      assert_equal 2, bot.lamed_ticks
+    end
+
+    test "a lamed bot revives at 1 HP once its timer runs out" do
+      bot = place_bot(@game, name: "A", x: 5, y: 5, hp: 0, downed: true, lamed_ticks: 0)
+      Tick.call(@game, client: StubClient.new("A" => { "command" => "idle" }))
+      bot.reload
+      assert_not bot.downed?
+      assert_equal 1, bot.hp
+      assert_equal 0, bot.lamed_ticks
     end
 
     test "scan widens vision for the next tick then reverts" do
