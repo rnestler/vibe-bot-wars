@@ -10,6 +10,12 @@ export default class extends Controller {
 
   connect() {
     this.cell = 26
+    this.bots = []
+    this.tooltip = this.buildTooltip()
+    this.onPointerMove = (event) => this.showBotTooltip(event)
+    this.onPointerLeave = () => this.hideTooltip()
+    this.canvasTarget.addEventListener("mousemove", this.onPointerMove)
+    this.canvasTarget.addEventListener("mouseleave", this.onPointerLeave)
     this.render(this.stateValue)
     this.subscription = consumer.subscriptions.create("ArenaChannel", {
       received: (data) => this.render(data),
@@ -18,15 +24,54 @@ export default class extends Controller {
 
   disconnect() {
     if (this.subscription) this.subscription.unsubscribe()
+    this.canvasTarget.removeEventListener("mousemove", this.onPointerMove)
+    this.canvasTarget.removeEventListener("mouseleave", this.onPointerLeave)
+    if (this.tooltip) this.tooltip.remove()
   }
 
   render(state) {
     if (!state || !state.width) return
+    this.bots = state.bots || []
     this.drawGrid(state)
     this.updateScoreboard(state)
     this.updateResults(state)
     if (this.hasTickTarget) this.tickTarget.textContent = `${state.tick} / ${state.max_ticks}`
     if (this.hasStatusTarget) this.statusTarget.textContent = this.statusLabel(state)
+  }
+
+  buildTooltip() {
+    const el = document.createElement("div")
+    el.className = "arena-tooltip"
+    el.style.display = "none"
+    document.body.appendChild(el)
+    return el
+  }
+
+  // Maps the cursor to a grid cell and, if a bot sits there, shows its name near the cursor.
+  showBotTooltip(event) {
+    const canvas = this.canvasTarget
+    const rect = canvas.getBoundingClientRect()
+    const gx = Math.floor(((event.clientX - rect.left) * (canvas.width / rect.width)) / this.cell)
+    const gy = Math.floor(((event.clientY - rect.top) * (canvas.height / rect.height)) / this.cell)
+    const bot = this.bots.find((b) => b.x === gx && b.y === gy)
+
+    if (!bot) {
+      this.hideTooltip()
+      canvas.style.cursor = "default"
+      return
+    }
+    canvas.style.cursor = "pointer"
+    this.tooltip.innerHTML =
+      `<b>${this.escape(bot.name)}</b>` +
+      `<span>${this.escape(bot.role_label || "")} · ${this.escape(bot.group_label || "")}</span>`
+    this.tooltip.style.display = "block"
+    this.tooltip.style.left = `${event.clientX + 12}px`
+    this.tooltip.style.top = `${event.clientY + 12}px`
+  }
+
+  hideTooltip() {
+    if (this.tooltip) this.tooltip.style.display = "none"
+    this.canvasTarget.style.cursor = "default"
   }
 
   statusLabel(state) {
