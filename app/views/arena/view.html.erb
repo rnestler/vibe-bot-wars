@@ -2,7 +2,9 @@
 
 <div data-controller="arena"
      data-arena-state-value="<%= @state.to_json %>">
-  <div class="panel">
+  <div class="panel" data-arena-target="results" style="display:none"></div>
+
+  <div class="panel" style="margin-top:20px">
     <div class="statline">
       <div>Status: <b data-arena-target="status">—</b></div>
       <div>Tick: <b data-arena-target="tick">—</b></div>
@@ -17,6 +19,4 @@
     <h2>Scoreboard</h2>
     <div data-arena-target="scoreboard"></div>
   </div>
-
-  <div class="panel" style="margin-top:20px" data-arena-target="results"></div>
 </div>

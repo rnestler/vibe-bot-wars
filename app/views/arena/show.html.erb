@@ -4,7 +4,9 @@
      data-controller="arena"
      data-arena-state-value="<%= @state.to_json %>">
   <div>
-    <div class="panel">
+    <div class="panel" data-arena-target="results" style="display:none"></div>
+
+    <div class="panel" style="margin-top:20px">
       <div class="statline">
         <div>Status: <b data-arena-target="status">—</b></div>
         <div>Tick: <b data-arena-target="tick">—</b></div>
@@ -21,10 +23,6 @@
       <% if @bots.empty? %>
         <p class="muted" style="margin-top:12px">No bots yet. <%= link_to "Register a bot", new_bot_path %> to get started.</p>
       <% end %>
-    </div>
-
-    <div class="panel" style="margin-top:20px" data-arena-target="results">
-      <!-- Overall + per-group results are rendered here by the arena Stimulus controller. -->
     </div>
   </div>
 

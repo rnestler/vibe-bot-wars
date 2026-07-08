@@ -219,38 +219,42 @@ export default class extends Controller {
 
   // Team scores only: each group ranked by its average gems per bot. Highlights the
   // leading (or, once finished, winning) group.
+  // Prominent team standings (big score per group), with a winner banner once finished.
   updateResults(state) {
     if (!this.hasResultsTarget) return
     const groups = [...(state.groups || [])].sort((a, b) => b.average - a.average)
     if (groups.every((g) => g.size === 0)) {
+      this.resultsTarget.style.display = "none"
       this.resultsTarget.innerHTML = ""
       return
     }
+    this.resultsTarget.style.display = ""
 
     const finished = state.status === "finished"
-    const rows = groups
+    const winner = groups.find((g) => g.key === state.winning_group && g.size > 0)
+    const banner =
+      finished && winner ? `<div class="winner-banner">🏆 ${this.escape(winner.label)} wins!</div>` : ""
+
+    const cards = groups
       .map((g, i) => {
-        const winner = g.key === state.winning_group && g.size > 0
+        const isWinner = g.key === state.winning_group && g.size > 0
         return `
-        <tr class="${winner ? "is-winner" : ""}">
-          <td class="num">${i + 1}</td>
-          <td>${this.escape(g.label)}${winner ? ` <span class="tag">${finished ? "winner" : "leading"}</span>` : ""}</td>
-          <td class="num">${g.average}</td>
-          <td class="num">${g.total}</td>
-          <td class="num">${g.size}</td>
-        </tr>`
+        <div class="teamcard${isWinner ? " is-winner" : ""}">
+          <div class="teamcard__rank">#${i + 1}</div>
+          <div class="teamcard__name">${this.escape(g.label)}</div>
+          <div class="teamcard__score">${g.average}</div>
+          <div class="teamcard__meta">${g.total} gems · ${g.size} bots</div>
+        </div>`
       })
       .join("")
 
     this.resultsTarget.innerHTML = `
-      <h2>${finished ? "Final team results" : "Team scores"}</h2>
-      <p class="muted" style="margin:0 0 10px">Score = average gems per bot in the group.</p>
-      <table class="score">
-        <thead>
-          <tr><th class="num">#</th><th>Group</th><th class="num">Score</th><th class="num">Gems</th><th class="num">Bots</th></tr>
-        </thead>
-        <tbody>${rows}</tbody>
-      </table>`
+      <div class="teamscores__head">
+        <h2>${finished ? "Final team scores" : "Team scores"}</h2>
+        <span class="muted">avg gems per bot</span>
+      </div>
+      ${banner}
+      <div class="teamcards">${cards}</div>`
   }
 
   botColor(id) {
