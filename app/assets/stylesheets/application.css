@@ -57,9 +57,11 @@ a { color: var(--accent); }
 .arena-tooltip span { display: block; color: var(--muted); }
 canvas { display: block; border-radius: 8px; max-width: 100%; }
 
-.statline { display: flex; gap: 20px; margin-bottom: 12px; font-variant-numeric: tabular-nums; }
+.statline { display: flex; align-items: baseline; gap: 20px; margin-bottom: 12px; font-variant-numeric: tabular-nums; }
 .statline b { color: var(--text); }
 .statline .muted { color: var(--muted); }
+.statline .countdown { margin-left: auto; color: var(--muted); }
+.statline .countdown b { font-size: 20px; color: var(--accent); }
 
 /* Fixed layout so columns keep a stable width regardless of the (varying) "Last" cell. */
 table.score { width: 100%; border-collapse: collapse; font-size: 14px; table-layout: fixed; }

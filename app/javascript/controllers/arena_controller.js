@@ -5,7 +5,7 @@ import consumer from "channels/consumer"
 // state comes from the server via the `state` value; subsequent ticks arrive over
 // ArenaChannel (broadcast by Arena::Broadcaster).
 export default class extends Controller {
-  static targets = ["canvas", "scoreboard", "tick", "status", "results"]
+  static targets = ["canvas", "scoreboard", "tick", "status", "results", "remaining"]
   static values = { state: Object }
 
   connect() {
@@ -36,6 +36,7 @@ export default class extends Controller {
     this.updateScoreboard(state)
     this.updateResults(state)
     if (this.hasTickTarget) this.tickTarget.textContent = `${state.tick} / ${state.max_ticks}`
+    if (this.hasRemainingTarget) this.remainingTarget.textContent = Math.max(0, state.max_ticks - state.tick)
     if (this.hasStatusTarget) this.statusTarget.textContent = this.statusLabel(state)
   }
 
