@@ -168,6 +168,19 @@ export default class extends Controller {
 
     ctx.globalAlpha = 1
     ctx.lineWidth = 1
+
+    // Name label above the bot, outlined for readability over any background.
+    ctx.font = "600 10px system-ui, -apple-system, sans-serif"
+    ctx.textAlign = "center"
+    ctx.textBaseline = "bottom"
+    ctx.lineWidth = 3
+    ctx.strokeStyle = "rgba(15,23,42,0.9)"
+    ctx.strokeText(bot.name, cx, cy - r - 3)
+    ctx.fillStyle = "#e2e8f0"
+    ctx.fillText(bot.name, cx, cy - r - 3)
+    ctx.lineWidth = 1
+    ctx.textAlign = "start"
+    ctx.textBaseline = "alphabetic"
   }
 
   // One table per role, each showing only that role's own score column, sorted by group
