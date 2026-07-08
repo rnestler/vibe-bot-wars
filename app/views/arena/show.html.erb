@@ -64,6 +64,9 @@
       <p class="muted" style="margin-top:10px;font-size:13px">
         The <code>arena:run</code> process ticks every <%= @game.tick_ms %> ms while a match is running.
       </p>
+      <p class="muted" style="margin-top:6px;font-size:13px">
+        Spectators can watch at <%= link_to "the view-only dashboard", arena_view_path %> — no controls, no login.
+      </p>
     </div>
 
     <div class="panel" style="margin-top:20px">

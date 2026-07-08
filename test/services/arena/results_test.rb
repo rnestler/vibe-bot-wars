@@ -22,7 +22,14 @@ module Arena
       assert_equal 2, groups["group_a"][:size]
       assert_equal 5.0, groups["group_b"][:average]
       assert_equal 10, groups["group_b"][:total]
-      assert_equal 0.0, groups["group_c"][:average]
+    end
+
+    test "a group with no bots scores zero" do
+      empty = Bot.groups.keys.last
+      place_bot(@game, name: "A1", x: 1, y: 1, group: Bot.groups.keys.first, gems_collected: 3)
+
+      groups = Results.new(@game).groups.index_by { |g| g[:key] }
+      assert_equal 0.0, groups[empty][:average]
     end
 
     test "winning group is the one with the highest average score" do

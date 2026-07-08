@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
-  # Live arena (the home page).
+  # Live arena. Root is the operator dashboard (Basic auth); `view` is a public,
+  # read-only spectator page — no controls, no login.
   root "arena#show"
+  get "view" => "arena#view", as: :arena_view
 
   # Registered bots: name + webhook URL. `test` probes the webhook once.
   resources :bots do

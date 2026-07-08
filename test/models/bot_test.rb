@@ -33,14 +33,15 @@ class BotTest < ActiveSupport::TestCase
     assert_equal Bot::ROLE_LABELS.fetch("collector"), bot.role_label
   end
 
-  test "can be assigned to any of the three groups and roles" do
+  test "can be assigned to any group and role" do
+    other_group = Bot.groups.keys.last
     bot = @game.bots.create!(name: "Grouped", webhook_url: "http://10.0.0.7/",
-                             group: "group_c", role: "healer")
+                             group: other_group, role: "healer")
     bot.reload
-    assert_equal "group_c", bot.group
+    assert_equal other_group, bot.group
     assert_equal "healer", bot.role
-    assert_equal Bot::GROUP_LABELS.fetch("group_c"), bot.group_label
-    assert_equal %w[group_a group_b group_c], Bot.groups.keys
+    assert_equal Bot::GROUP_LABELS.fetch(other_group), bot.group_label
+    assert_equal Bot::GROUP_LABELS.keys, Bot.groups.keys
     assert_equal %w[collector fighter healer], Bot.roles.keys
   end
 
