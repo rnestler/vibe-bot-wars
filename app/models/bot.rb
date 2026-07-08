@@ -9,9 +9,8 @@ class Bot < ApplicationRecord
   # Display names for the three groups (one per school class). Rename these labels to
   # whatever the classes should be called in the UI — the enum keys below stay the same.
   GROUP_LABELS = {
-    "group_a" => "KSH 23a",
-    "group_b" => "KBW 23a",
-    "group_c" => "Group C"
+    "group_a" => "Yellow",
+    "group_b" => "Gold"
   }.freeze
 
   # Role determines what a bot can do (see Arena::Tick). Only collectors score gems;
@@ -24,7 +23,7 @@ class Bot < ApplicationRecord
 
   belongs_to :game, default: -> { Game.current }
 
-  enum :group, { group_a: 0, group_b: 1, group_c: 2 }, default: :group_a
+  enum :group, { group_a: 0, group_b: 1 }, default: :group_a
   enum :role, { collector: 0, fighter: 1, healer: 2 }, default: :collector
 
   before_validation :normalize_webhook_url
