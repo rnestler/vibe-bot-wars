@@ -207,13 +207,23 @@ module Arena
       assert_equal 0, bot.lamed_ticks
     end
 
-    test "respawn teleports the bot to a free cell and blocks it briefly" do
+    test "respawn teleports the bot to a free cell, blocks it, and starts a cooldown" do
       bot = place_bot(@game, name: "A", x: 5, y: 5)
       Tick.call(@game, client: StubClient.new("A" => { "command" => "respawn" }))
       bot.reload
       assert_not_equal [5, 5], bot.coordinates
       assert_predicate bot, :placed?
       assert_equal @game.respawn_block_ticks, bot.blocked_ticks
+      assert_equal @game.respawn_cooldown_ticks, bot.respawn_cooldown
+    end
+
+    test "respawn is refused while on cooldown, and the cooldown ticks down" do
+      bot = place_bot(@game, name: "A", x: 5, y: 5, respawn_cooldown: 10)
+      Tick.call(@game, client: StubClient.new("A" => { "command" => "respawn" }))
+      bot.reload
+      assert_equal [5, 5], bot.coordinates, "did not teleport while on cooldown"
+      assert_equal 0, bot.blocked_ticks, "no block applied"
+      assert_equal 9, bot.respawn_cooldown, "cooldown ticked down"
     end
 
     test "a blocked bot ignores commands and counts down, then acts" do

@@ -18,7 +18,8 @@ class Game < ApplicationRecord
   validates :max_ticks, :tick_ms, :gem_count, :scan_radius, :max_hp,
             :fighter_max_hp, :fighter_collision_damage, :heal_amount, :lame_ticks,
             numericality: { greater_than: 0 }
-  validates :respawn_block_ticks, numericality: { greater_than_or_equal_to: 0 }
+  validates :respawn_block_ticks, :respawn_cooldown_ticks,
+            numericality: { greater_than_or_equal_to: 0 }
   validates :vision_radius, numericality: { greater_than_or_equal_to: 1 }
 
   STATUSES.each do |state|

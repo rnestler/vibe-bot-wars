@@ -17,6 +17,7 @@ require "json"
 
 PORT = (ARGV[0] || 4567).to_i
 DIRS = { "N" => [0, -1], "E" => [1, 0], "S" => [0, 1], "W" => [-1, 0] }.freeze
+RESPAWN_CHANCE = 0.02 # roughly once every ~50 ticks, teleport to shake things up
 
 def decide(payload)
   me = payload["self"] or return { command: "idle" }
@@ -25,6 +26,7 @@ def decide(payload)
   gems = vision["gems"] || []
 
   return { command: "repair" } if me["downed"] || me["hp"] <= me["max_hp"].to_i * 0.3
+  return { command: "respawn" } if me["respawn_cooldown"].to_i.zero? && rand < RESPAWN_CHANCE
 
   if gems.any?
     target = gems.min_by { |x, y| (x - me["x"]).abs + (y - me["y"]).abs }

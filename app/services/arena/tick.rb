@@ -94,6 +94,7 @@ module Arena
       @collision_cells = Set.new # contested cells, for the UI highlight
       intents = {} # bot => target [x, y]
 
+      advance_cooldowns # tick down respawn cooldowns for every bot
       advance_lame_states # count down / revive lamed bots before they may act
 
       @bots.each do |bot|
@@ -120,6 +121,10 @@ module Arena
       movers = settle_conflicts(intents)
       apply_moves(movers)
       apply_damage
+    end
+
+    def advance_cooldowns
+      @bots.each { |bot| bot.respawn_cooldown -= 1 if bot.respawn_cooldown.positive? }
     end
 
     # A lamed bot is out of action until its timer runs out, then it revives at 1 HP.
@@ -241,12 +246,15 @@ module Arena
     end
 
     # Teleports the bot to a random free cell, then blocks it for a short time as the
-    # cost. Does nothing if the board is full.
+    # cost. Refused while on cooldown or if the board is full.
     def respawn(bot)
+      return if bot.respawn_cooldown.positive?
+
       cell = free_cells.sample or return
 
       bot.x, bot.y = cell
       bot.blocked_ticks = @game.respawn_block_ticks
+      bot.respawn_cooldown = @game.respawn_cooldown_ticks
     end
 
     def respawn_gem
