@@ -146,7 +146,7 @@ export default class extends Controller {
     const r = c * 0.36
     const color = this.botColor(bot.id)
 
-    ctx.globalAlpha = bot.downed ? 0.4 : 1
+    ctx.globalAlpha = bot.downed || bot.blocked_ticks > 0 ? 0.4 : 1
     ctx.fillStyle = color
     ctx.beginPath()
     ctx.arc(cx, cy, r, 0, Math.PI * 2)

@@ -73,6 +73,7 @@ module Arena
       when "scan" then { type: "scan" }
       when "repair" then { type: "repair" }
       when "heal" then { type: "heal" }
+      when "respawn" then { type: "respawn" }
       when "idle" then { type: "idle" }
       else { type: "idle", error: "unknown command" }
       end
@@ -100,12 +101,18 @@ module Arena
           bot.last_command = "lamed" # lamed bots take no action at all
           next
         end
+        if bot.blocked_ticks.positive? # blocked after a respawn: out of action, counting down
+          bot.blocked_ticks -= 1
+          bot.last_command = "blocked"
+          next
+        end
 
         action = actions[bot]
         case action[:type]
         when "repair" then bot.repair!(@game.repair_amount, bot.max_hp)
         when "heal" then heal_allies(bot)
         when "scan" then bot.vision_radius = @game.scan_radius
+        when "respawn" then respawn(bot)
         when "move" then classify_move(bot, action[:dir], intents)
         end
       end
@@ -133,6 +140,7 @@ module Arena
       bot.hp = 1
       bot.downed = false
       bot.lamed_ticks = 0
+      bot.blocked_ticks = 0
     end
 
     def classify_move(bot, dir, intents)
@@ -232,12 +240,26 @@ module Arena
       [(a.x - b.x).abs, (a.y - b.y).abs].max
     end
 
+    # Teleports the bot to a random free cell, then blocks it for a short time as the
+    # cost. Does nothing if the board is full.
+    def respawn(bot)
+      cell = free_cells.sample or return
+
+      bot.x, bot.y = cell
+      bot.blocked_ticks = @game.respawn_block_ticks
+    end
+
     def respawn_gem
+      free = free_cells
+      @gems << free.sample if free.any?
+    end
+
+    # Cells not occupied by a wall, a placed bot, or a gem.
+    def free_cells
       occupied = @game.walls.to_set { |c| [c[0], c[1]] }
       @bots.each { |b| occupied << b.coordinates if b.placed? }
       @gems.each { |c| occupied << c }
-      free = (0...@game.width).to_a.product((0...@game.height).to_a) - occupied.to_a
-      @gems << free.sample if free.any?
+      (0...@game.width).to_a.product((0...@game.height).to_a) - occupied.to_a
     end
 
     def apply_damage

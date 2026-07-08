@@ -43,7 +43,7 @@ module Arena
       @game.bots.find_each do |bot|
         max_hp = role_max_hp(bot)
         bot.assign_attributes(
-          max_hp: max_hp, hp: max_hp, downed: false, lamed_ticks: 0,
+          max_hp: max_hp, hp: max_hp, downed: false, lamed_ticks: 0, blocked_ticks: 0,
           gems_collected: 0, damage_dealt: 0, hp_restored: 0,
           heading: Game::HEADINGS.sample, vision_radius: @game.vision_radius,
           last_command: nil, last_error: nil

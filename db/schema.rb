@@ -10,12 +10,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_08_130000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_08_140000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
   create_table "bots", force: :cascade do |t|
     t.boolean "active", default: true, null: false
+    t.integer "blocked_ticks", default: 0, null: false
     t.datetime "created_at", null: false
     t.integer "damage_dealt", default: 0, null: false
     t.boolean "downed", default: false, null: false
@@ -60,6 +61,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_08_130000) do
     t.integer "max_hp", default: 100, null: false
     t.integer "max_ticks", default: 400, null: false
     t.integer "repair_amount", default: 20, null: false
+    t.integer "respawn_block_ticks", default: 3, null: false
     t.integer "scan_radius", default: 4, null: false
     t.datetime "started_at"
     t.string "status", default: "setup", null: false

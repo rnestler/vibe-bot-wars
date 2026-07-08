@@ -207,6 +207,29 @@ module Arena
       assert_equal 0, bot.lamed_ticks
     end
 
+    test "respawn teleports the bot to a free cell and blocks it briefly" do
+      bot = place_bot(@game, name: "A", x: 5, y: 5)
+      Tick.call(@game, client: StubClient.new("A" => { "command" => "respawn" }))
+      bot.reload
+      assert_not_equal [5, 5], bot.coordinates
+      assert_predicate bot, :placed?
+      assert_equal @game.respawn_block_ticks, bot.blocked_ticks
+    end
+
+    test "a blocked bot ignores commands and counts down, then acts" do
+      bot = place_bot(@game, name: "A", x: 5, y: 5, blocked_ticks: 2)
+      Tick.call(@game, client: StubClient.new("A" => move("E")))
+      assert_equal [5, 5], bot.reload.coordinates
+      assert_equal 1, bot.blocked_ticks
+
+      Tick.call(@game, client: StubClient.new("A" => move("E")))
+      assert_equal [5, 5], bot.reload.coordinates
+      assert_equal 0, bot.blocked_ticks
+
+      Tick.call(@game, client: StubClient.new("A" => move("E")))
+      assert_equal [6, 5], bot.reload.coordinates
+    end
+
     test "scan widens vision for the next tick then reverts" do
       bot = place_bot(@game, name: "A", x: 5, y: 5)
       Tick.call(@game, client: StubClient.new("A" => { "command" => "scan" }))
