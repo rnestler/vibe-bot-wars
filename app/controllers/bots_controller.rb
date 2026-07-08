@@ -4,13 +4,16 @@
 # confirm their server responds with a valid command.
 class BotsController < ApplicationController
   before_action :set_bot, only: %i[edit update destroy test]
+  # No new registrations while a match is running (editing existing bots is still allowed).
+  before_action :block_while_running, only: %i[new create]
   # Only the operator may delete bots; participants can register and edit their own.
   before_action :require_admin, only: :destroy
   # Editing is allowed from the bot's own host, otherwise it falls back to operator auth.
   before_action :authorize_bot_edit, only: %i[edit update]
 
   def index
-    @bots = Game.current.bots.order(:id)
+    @game = Game.current
+    @bots = @game.bots.order(:id)
   end
 
   def new
@@ -56,6 +59,13 @@ class BotsController < ApplicationController
 
   def set_bot
     @bot = Game.current.bots.find(params.expect(:id))
+  end
+
+  # New bots may not be added mid-match; the roster can't grow until the match is stopped.
+  def block_while_running
+    return unless Game.current.running?
+
+    redirect_to bots_path, alert: "New bots can't be added while a match is running — stop the match first."
   end
 
   # Allow editing straight through if the request comes from the bot's own webhook host;

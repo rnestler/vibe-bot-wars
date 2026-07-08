@@ -3,8 +3,14 @@
 <div class="panel">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
     <h2 style="margin:0">Registered bots</h2>
-    <%= link_to "Add bot", new_bot_path, class: "btn btn--primary" %>
+    <% unless @game.running? %>
+      <%= link_to "Add bot", new_bot_path, class: "btn btn--primary" %>
+    <% end %>
   </div>
+
+  <% if @game.running? %>
+    <p class="muted" style="margin:0 0 12px">A match is running — new bots can't be added until it's stopped. You can still edit existing ones.</p>
+  <% end %>
 
   <% if @bots.any? %>
     <table class="bots-list">

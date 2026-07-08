@@ -30,7 +30,7 @@
   <aside>
     <div class="panel">
       <h2>Match</h2>
-      <%= form_with url: start_match_path, method: :post, class: "controls" do |f| %>
+      <%= form_with url: start_match_path, method: :post, class: "controls", id: "match-form" do %>
         <div class="row">
           <div>
             <label>Width</label>
@@ -55,11 +55,13 @@
           <label>Tick interval (ms)</label>
           <%= number_field_tag :tick_ms, @game.tick_ms, min: 100, max: 5000, step: 50 %>
         </div>
-        <div class="btn-row">
-          <%= f.submit "New match", class: "btn btn--primary" %>
-          <%= button_to "Stop", stop_match_path, method: :post, class: "btn btn--ghost" %>
-        </div>
       <% end %>
+      <%# Kept OUTSIDE the form above: nesting the Stop button_to (its own form) inside it
+          is invalid HTML and made Stop submit the start-match form. %>
+      <div class="btn-row" style="margin-top:12px">
+        <%= submit_tag "New match", form: "match-form", class: "btn btn--primary" %>
+        <%= button_to "Stop", stop_match_path, method: :post, class: "btn btn--ghost" %>
+      </div>
       <p class="muted" style="margin-top:10px;font-size:13px">
         The <code>arena:run</code> process ticks every <%= @game.tick_ms %> ms while a match is running.
       </p>
@@ -72,7 +74,7 @@
       <h2>Bots</h2>
       <div class="btn-row" style="margin-bottom:10px">
         <%= link_to "Manage bots", bots_path, class: "btn btn--ghost" %>
-        <%= link_to "Add bot", new_bot_path, class: "btn btn--ghost" %>
+        <%= link_to "Add bot", new_bot_path, class: "btn btn--ghost" unless @game.running? %>
       </div>
       <p class="muted" style="font-size:13px">
         Point a bot's webhook at your own server, or at

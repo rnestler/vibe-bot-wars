@@ -230,6 +230,17 @@ module Arena
       assert_equal @game.respawn_cooldown_ticks, bot.respawn_cooldown
     end
 
+    test "respawn heals up to 50% of max HP, but never lowers current HP" do
+      low = place_bot(@game, name: "A", x: 5, y: 5, hp: 20)
+      high = place_bot(@game, name: "B", x: 7, y: 7, hp: 80)
+      Tick.call(@game, client: StubClient.new(
+        "A" => { "command" => "respawn" }, "B" => { "command" => "respawn" }
+      ))
+
+      assert_equal @game.max_hp / 2, low.reload.hp, "healed up to half"
+      assert_equal 80, high.reload.hp, "already above half, unchanged"
+    end
+
     test "respawn is refused while on cooldown, and the cooldown ticks down" do
       bot = place_bot(@game, name: "A", x: 5, y: 5, respawn_cooldown: 10)
       Tick.call(@game, client: StubClient.new("A" => { "command" => "respawn" }))

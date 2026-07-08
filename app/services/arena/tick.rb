@@ -245,14 +245,16 @@ module Arena
       [(a.x - b.x).abs, (a.y - b.y).abs].max
     end
 
-    # Teleports the bot to a random free cell, then blocks it for a short time as the
-    # cost. Refused while on cooldown or if the board is full.
+    # Teleports the bot to a random free cell and restores its HP to at least half of max
+    # (never lowering it), then blocks it for a short time as the cost. Refused while on
+    # cooldown or if the board is full.
     def respawn(bot)
       return if bot.respawn_cooldown.positive?
 
       cell = free_cells.sample or return
 
       bot.x, bot.y = cell
+      bot.hp = [bot.hp, bot.max_hp / 2].max
       bot.blocked_ticks = @game.respawn_block_ticks
       bot.respawn_cooldown = @game.respawn_cooldown_ticks
     end

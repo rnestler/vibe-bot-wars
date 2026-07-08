@@ -68,4 +68,28 @@ class BotsControllerTest < ActionDispatch::IntegrationTest
     get edit_bot_path(bot), headers: admin_headers
     assert_response :success
   end
+
+  test "new bots cannot be added while a match is running" do
+    Game.current.update!(status: "running")
+
+    get new_bot_path
+    assert_redirected_to bots_path
+
+    assert_no_difference("Bot.count") do
+      post bots_path, params: { bot: { name: "Latecomer", webhook_url: "http://127.0.0.1:5000/" } }
+    end
+    assert_redirected_to bots_path
+  end
+
+  test "existing bots can still be edited while a match is running" do
+    bot = create_bot("http://127.0.0.1:4000/") # own host
+    Game.current.update!(status: "running")
+
+    get edit_bot_path(bot)
+    assert_response :success
+
+    patch bot_path(bot), params: { bot: { name: "Renamed" } }
+    assert_redirected_to bots_path
+    assert_equal "Renamed", bot.reload.name
+  end
 end
