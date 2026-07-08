@@ -167,6 +167,19 @@ module Arena
       assert_equal 40, far_ally.reload.hp, "out-of-range ally is not healed"
     end
 
+    test "a collector knocked out drops its collected gems onto the map" do
+      @game.update!(gems: []) # start with an empty board so the drop is easy to count
+      bot = place_bot(@game, name: "A", x: 0, y: 5, hp: 5, gems_collected: 3)
+      Tick.call(@game, client: StubClient.new("A" => move("W"))) # off-grid crash -> 0 HP
+      bot.reload
+      @game.reload
+
+      assert_predicate bot, :downed?
+      assert_equal 0, bot.gems_collected, "loses all its gems when downed"
+      assert_equal 3, @game.gems.size, "the 3 gems now sit on the map"
+      assert_not_includes @game.gems, [0, 5], "not on the downed bot's own cell"
+    end
+
     test "collecting a gem scores and respawns to keep the board full" do
       @game.update!(gems: [[6, 5]])
       bot = place_bot(@game, name: "A", x: 5, y: 5)

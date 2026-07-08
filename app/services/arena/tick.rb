@@ -121,6 +121,7 @@ module Arena
       movers = settle_conflicts(intents)
       apply_moves(movers)
       apply_damage
+      replenish_gems # top the board back up to gem_count after pickups
     end
 
     def advance_cooldowns
@@ -223,7 +224,6 @@ module Arena
       return unless @gems.delete(cell)
 
       bot.gems_collected += 1
-      respawn_gem
     end
 
     # A healer mends every same-group ally within its (current) vision radius, reviving
@@ -257,9 +257,14 @@ module Arena
       bot.respawn_cooldown = @game.respawn_cooldown_ticks
     end
 
-    def respawn_gem
-      free = free_cells
-      @gems << free.sample if free.any?
+    # Keeps at least gem_count gems on the board. Dropped loot can push the count above
+    # gem_count; that excess is simply not topped up until it's collected back down.
+    def replenish_gems
+      while @gems.size < @game.gem_count
+        cell = free_cells.sample or break
+
+        @gems << cell
+      end
     end
 
     # Cells not occupied by a wall, a placed bot, or a gem.
@@ -274,7 +279,7 @@ module Arena
       @crashers.each do |bot|
         before = bot.hp
         bot.damage!(@game.wall_damage)
-        start_lame(bot) if before.positive? && bot.hp.zero?
+        knock_out(bot) if before.positive? && bot.hp.zero?
       end
       # Each bot takes the hardest hit among the bots it collided with; fighters hit harder.
       # Credit the actual HP lost to whoever landed that hit.
@@ -283,13 +288,26 @@ module Arena
         before = bot.hp
         bot.damage!(collision_damage_from(dealer))
         dealer.damage_dealt += before - bot.hp
-        start_lame(bot) if before.positive? && bot.hp.zero?
+        knock_out(bot) if before.positive? && bot.hp.zero?
       end
     end
 
-    # Begins the lame timer the moment a bot is knocked to 0 (not on later hits while down).
-    def start_lame(bot)
+    # The moment a bot is knocked to 0 (not on later hits while down): start its lame timer
+    # and, if it's a collector, spill the gems it was carrying back onto the map.
+    def knock_out(bot)
       bot.lamed_ticks = @game.lame_ticks
+      drop_gems(bot)
+    end
+
+    # A downed collector loses all its gems; they scatter onto the free cells nearest to
+    # where it fell, so other bots can grab them.
+    def drop_gems(bot)
+      return unless bot.collector? && bot.gems_collected.positive?
+
+      count = bot.gems_collected
+      bot.gems_collected = 0
+      nearest = free_cells.sort_by { |x, y| (x - bot.x).abs + (y - bot.y).abs }
+      @gems.concat(nearest.first(count))
     end
 
     def collision_damage_from(bot)
