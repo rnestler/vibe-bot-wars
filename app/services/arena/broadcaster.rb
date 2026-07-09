@@ -34,6 +34,7 @@ module Arena
         collisions: @collisions,
         winner_bot_id: @game.winner_bot_id,
         winning_group: results.winning_group,
+        score_exponent: @game.score_exponent.to_f,
         groups: results.group_summaries,
         bots: @game.bots.order(:id).map { |bot| bot_state(bot) }
       }

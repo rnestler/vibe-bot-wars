@@ -231,12 +231,11 @@ export default class extends Controller {
       </tr>`
   }
 
-  // Team scores only: each group ranked by its average gems per bot. Highlights the
-  // leading (or, once finished, winning) group.
-  // Prominent team standings (big score per group), with a winner banner once finished.
+  // Prominent team standings (a size-handicapped score per group), with a winner banner
+  // once finished.
   updateResults(state) {
     if (!this.hasResultsTarget) return
-    const groups = [...(state.groups || [])].sort((a, b) => b.average - a.average)
+    const groups = [...(state.groups || [])].sort((a, b) => b.score - a.score)
     if (groups.every((g) => g.size === 0)) {
       this.resultsTarget.style.display = "none"
       this.resultsTarget.innerHTML = ""
@@ -256,7 +255,7 @@ export default class extends Controller {
         <div class="teamcard${isWinner ? " is-winner" : ""}">
           <div class="teamcard__rank">#${i + 1}</div>
           <div class="teamcard__name">${this.escape(g.label)}</div>
-          <div class="teamcard__score">${g.average}</div>
+          <div class="teamcard__score">${g.score}</div>
           <div class="teamcard__meta">${g.total} gems · ${g.size} bots</div>
         </div>`
       })
@@ -265,7 +264,7 @@ export default class extends Controller {
     this.resultsTarget.innerHTML = `
       <div class="teamscores__head">
         <h2>${finished ? "Final team scores" : "Team scores"}</h2>
-        <span class="muted">avg gems per bot</span>
+        <span class="muted">gems ÷ bots^${state.score_exponent ?? ""}</span>
       </div>
       ${banner}
       <div class="teamcards">${cards}</div>`

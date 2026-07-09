@@ -20,6 +20,7 @@ class Game < ApplicationRecord
             numericality: { greater_than: 0 }
   validates :respawn_block_ticks, :respawn_cooldown_ticks,
             numericality: { greater_than_or_equal_to: 0 }
+  validates :score_exponent, numericality: { greater_than_or_equal_to: 1 }
   validates :vision_radius, numericality: { greater_than_or_equal_to: 1 }
 
   STATUSES.each do |state|

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_08_150000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_08_160000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -65,6 +65,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_08_150000) do
     t.integer "respawn_block_ticks", default: 3, null: false
     t.integer "respawn_cooldown_ticks", default: 100, null: false
     t.integer "scan_radius", default: 4, null: false
+    t.decimal "score_exponent", precision: 4, scale: 2, default: "1.5", null: false
     t.datetime "started_at"
     t.string "status", default: "setup", null: false
     t.integer "tick", default: 0, null: false
